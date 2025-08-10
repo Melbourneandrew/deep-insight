@@ -10,6 +10,15 @@ from app.controllers.response_controller import router as response_router
 from app.controllers.procedures.simulate_interview_controller import (
     router as simulate_router,
 )
+from app.controllers.procedures.start_interview_controller import (
+    router as start_interview_router,
+)
+from app.controllers.procedures.next_question_controller import (
+    router as next_question_router,
+)
+from app.controllers.procedures.answer_question_controller import (
+    router as answer_question_router,
+)
 
 
 app = FastAPI(title="Deep Insight API", version="0.1.0")
@@ -45,3 +54,7 @@ app.include_router(question_router)
 app.include_router(interview_router)
 app.include_router(response_router)
 app.include_router(simulate_router)
+
+app.include_router(start_interview_router)
+app.include_router(next_question_router)
+app.include_router(answer_question_router)

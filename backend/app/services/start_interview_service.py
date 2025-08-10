@@ -24,21 +24,21 @@ class StartInterviewService:
         Raises:
             ValueError: If employee does not exist
         """
-        # # Validate employee exists
-        # employee = self.session.get(Employee, request.employee_id)
-        # if not employee:
-        #     raise ValueError(f"Employee with ID {request.employee_id} not found")
+        # Validate employee exists
+        employee = self.session.get(Employee, request.employee_id)
+        if not employee:
+            raise ValueError(f"Employee with ID {request.employee_id} not found")
 
-        # # Create new interview record
-        # interview = Interview(business_id=employee.business_id)
+        # Create new interview record
+        interview = Interview(
+            business_id=employee.business_id, employee_id=request.employee_id
+        )
 
-        # self.session.add(interview)
-        # self.session.commit()
-        # self.session.refresh(interview)
+        self.session.add(interview)
+        self.session.commit()
+        self.session.refresh(interview)
 
-        # return StartInterviewResponse(interview_id=interview.id)
-
-        return StartInterviewResponse(interview_id=uuid4())
+        return StartInterviewResponse(interview_id=interview.id)
 
 
 def get_start_interview_service(

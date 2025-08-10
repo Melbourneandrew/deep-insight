@@ -24,39 +24,36 @@ class NextQuestionService:
         Raises:
             ValueError: If interview does not exist
         """
-        # # Validate interview exists
-        # interview = self.session.get(Interview, request.interview_id)
-        # if not interview:
-        #     raise ValueError(f"Interview with ID {request.interview_id} not found")
+        # Validate interview exists
+        interview = self.session.get(Interview, request.interview_id)
+        if not interview:
+            raise ValueError(f"Interview with ID {request.interview_id} not found")
 
-        # # Get all questions for the business, ordered by order_index
-        # questions_stmt = (
-        #     select(Question)
-        #     .where(Question.business_id == interview.business_id)
-        #     .order_by(Question.order_index.asc())
-        # )
-        # questions = self.session.exec(questions_stmt).all()
+        # Get the first unanswered question using LEFT JOIN
+        # This finds questions that don't have responses for this interview
+        unanswered_question_stmt = (
+            select(Question)
+            .outerjoin(
+                QuestionResponse,
+                (QuestionResponse.question_id == Question.id)
+                & (QuestionResponse.interview_id == request.interview_id),
+            )
+            .where(
+                (Question.business_id == interview.business_id)
+                & (QuestionResponse.question_id.is_(None))  # No response exists
+            )
+            .order_by(Question.order_index.asc())
+        )
 
-        # if not questions:
-        #     return NextQuestionResponse(question=None, is_interview_over=True)
+        unanswered_question = self.session.exec(unanswered_question_stmt).first()
 
-        # # Get all answered questions for this interview
-        # answered_questions_stmt = select(QuestionResponse.question_id).where(
-        #     QuestionResponse.interview_id == request.interview_id
-        # )
-        # answered_question_ids = set(self.session.exec(answered_questions_stmt).all())
-
-        # # Find the first unanswered question
-        # for question in questions:
-        #     if question.id not in answered_question_ids:
-        #         return NextQuestionResponse(question=question, is_interview_over=False)
+        if unanswered_question:
+            return NextQuestionResponse(
+                question=unanswered_question, is_interview_over=False
+            )
 
         # All questions have been answered
-        # return NextQuestionResponse(question=None, is_interview_over=True)
-
-        return NextQuestionResponse(
-            question="How far away is the sun?", is_interview_over=True
-        )
+        return NextQuestionResponse(question=None, is_interview_over=True)
 
 
 def get_next_question_service(

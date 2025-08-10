@@ -1,8 +1,7 @@
-from uuid import uuid4
-from sqlmodel import Session, select
+from sqlmodel import Session
 from fastapi import Depends
 from app.services.schemas.schema import AnswerQuestionRequest, AnswerQuestionResponse
-from app.models.models import Interview, Question, QuestionResponse, Employee
+from app.models.models import Interview, Question, QuestionResponse
 from app.db import get_session
 
 
@@ -26,44 +25,32 @@ class AnswerQuestionService:
             ValueError: If interview or question does not exist, or if they don't belong to the same business
         """
         # Validate interview exists
-        # interview = self.session.get(Interview, request.interview_id)
-        # if not interview:
-        #     raise ValueError(f"Interview with ID {request.interview_id} not found")
+        interview = self.session.get(Interview, request.interview_id)
+        if not interview:
+            raise ValueError(f"Interview with ID {request.interview_id} not found")
 
-        # # Validate question exists
-        # question = self.session.get(Question, request.question_id)
-        # if not question:
-        #     raise ValueError(f"Question with ID {request.question_id} not found")
+        # Validate question exists
+        question = self.session.get(Question, request.question_id)
+        if not question:
+            raise ValueError(f"Question with ID {request.question_id} not found")
 
-        # # Validate question belongs to the same business as the interview
-        # if question.business_id != interview.business_id:
-        #     raise ValueError("Question and interview must belong to the same business")
+        # Validate question belongs to the same business as the interview
+        if question.business_id != interview.business_id:
+            raise ValueError("Question and interview must belong to the same business")
 
-        # # Get the first employee from the business for this response
-        # # Note: In a real scenario, we might need employee_id in the request
-        # # For now, we'll use the first employee from the business
-        # employee_stmt = select(Employee).where(
-        #     Employee.business_id == interview.business_id
-        # )
-        # employee = self.session.exec(employee_stmt).first()
-        # if not employee:
-        #     raise ValueError(f"No employees found for business {interview.business_id}")
+        # Create the question response record using the employee from the interview
+        response = QuestionResponse(
+            interview_id=request.interview_id,
+            employee_id=interview.employee_id,
+            question_id=request.question_id,
+            content=request.content,
+        )
 
-        # # Create the question response record
-        # response = QuestionResponse(
-        #     interview_id=request.interview_id,
-        #     employee_id=employee.id,
-        #     question_id=request.question_id,
-        #     content=request.content,
-        # )
+        self.session.add(response)
+        self.session.commit()
+        self.session.refresh(response)
 
-        # self.session.add(response)
-        # self.session.commit()
-        # self.session.refresh(response)
-
-        # return AnswerQuestionResponse(success=True, interview_id=request.interview_id)
-
-        return AnswerQuestionResponse(success=True, interview_id=uuid4())
+        return AnswerQuestionResponse(success=True, interview_id=request.interview_id)
 
 
 def get_answer_question_service(
