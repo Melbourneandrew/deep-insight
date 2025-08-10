@@ -80,14 +80,14 @@ export default function InterviewsPage() {
 
   // Polling for updates every second
   useEffect(() => {
-    if (!businessId || loading) return;
+    if (!businessId) return;
 
     const interval = setInterval(() => {
       loadData(false);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [businessId, loading]);
+  }, [businessId]);
 
   const handleBuildWiki = async () => {
     try {
