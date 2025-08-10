@@ -21,6 +21,15 @@ def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
     return session.exec(select(Business)).all()
 
 
+def _generate_employee_email(original_email: str, business_name: str) -> str:
+    """Generate employee email using the username from original email and business domain."""
+    # Extract username from original email (part before @)
+    username = original_email.split("@")[0]
+    # Clean business name: remove spaces, convert to lowercase, remove special chars
+    clean_name = "".join(c.lower() for c in business_name if c.isalnum())
+    return f"{username}@{clean_name}.com"
+
+
 def _load_default_seed_data() -> BusinessSeedData:
     """Load default seed data from JSON file."""
     current_dir = os.path.dirname(__file__)
@@ -44,8 +53,9 @@ def _seed_business_data(
     """Seed a business with employees and questions."""
     # Create employees
     for employee_data in seed_data.employees:
+        generated_email = _generate_employee_email(employee_data.email, business.name)
         employee = Employee(
-            email=employee_data.email, bio=employee_data.bio, business_id=business.id
+            email=generated_email, bio=employee_data.bio, business_id=business.id
         )
         session.add(employee)
 

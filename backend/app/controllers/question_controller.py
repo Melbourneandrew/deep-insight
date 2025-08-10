@@ -18,7 +18,7 @@ def list_questions(
     business_id: UUID | None = Query(default=None),
     session: Session = Depends(get_session),
 ) -> List[Question]:
-    statement = select(Question)
+    statement = select(Question).where(Question.is_follow_up == False)
     if business_id:
         statement = statement.where(Question.business_id == business_id)
     return session.exec(statement).all()

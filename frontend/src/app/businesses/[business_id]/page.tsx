@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { AddEmployeeModal } from "@/components/AddEmployeeModal";
 import { AddQuestionModal } from "@/components/AddQuestionModal";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Play } from "lucide-react";
 import { api } from "@/lib/api";
+import { StartInterviewsModal } from "./StartInterviewsModal";
 
 interface Business {
   id: string;
@@ -41,6 +42,7 @@ export default function BusinessDetailsPage() {
   // Modal states
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [showAddQuestion, setShowAddQuestion] = useState(false);
+  const [showStartInterviews, setShowStartInterviews] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{
     type: "employee" | "question";
     id: string;
@@ -75,7 +77,8 @@ export default function BusinessDetailsPage() {
 
         setBusiness(businessData);
         setEmployees(employeesData);
-        setQuestions(questionsData);
+        // Filter out follow-up questions
+        setQuestions(questionsData.filter((q: Question) => !q.is_follow_up));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load data");
       } finally {
@@ -188,25 +191,31 @@ export default function BusinessDetailsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Business Name Header */}
-      <div className="mb-8">
-        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-          BUSINESS
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+            BUSINESS
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
+        <Button onClick={() => setShowStartInterviews(true)}>
+          <Play className="w-4 h-4 mr-2" />
+          Start Interviews
+        </Button>
       </div>
 
       {/* Side-by-side Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Employees Table */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="">
+          <div className="py-4 px-2 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">Employees</h2>
             <Button onClick={() => setShowAddEmployee(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Employee
             </Button>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
@@ -259,15 +268,15 @@ export default function BusinessDetailsPage() {
         </div>
 
         {/* Questions Table */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="">
+          <div className="py-4 px-2 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">Questions</h2>
             <Button onClick={() => setShowAddQuestion(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Create Question
             </Button>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
@@ -345,6 +354,12 @@ export default function BusinessDetailsPage() {
         isOpen={showAddQuestion}
         onClose={() => setShowAddQuestion(false)}
         onAdd={handleAddQuestion}
+      />
+
+      <StartInterviewsModal
+        isOpen={showStartInterviews}
+        onClose={() => setShowStartInterviews(false)}
+        businessId={businessId}
       />
 
       <ConfirmDelete

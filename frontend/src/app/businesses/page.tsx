@@ -46,7 +46,11 @@ export default function BusinessesPage() {
       console.log("Parsing JSON...");
       const data = await response.json();
       console.log("Data received:", data);
-      setBusinesses(data);
+      // Sort businesses in reverse chronological order (by ID as proxy for creation time)
+      const sortedData = data.sort((a: Business, b: Business) =>
+        b.id.localeCompare(a.id)
+      );
+      setBusinesses(sortedData);
       console.log("Businesses set successfully");
     } catch (err) {
       console.error("Detailed error in fetchBusinesses:", err);

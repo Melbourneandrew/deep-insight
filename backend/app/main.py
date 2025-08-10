@@ -7,6 +7,9 @@ from app.controllers.employee_controller import router as employee_router
 from app.controllers.question_controller import router as question_router
 from app.controllers.interview_controller import router as interview_router
 from app.controllers.response_controller import router as response_router
+from app.controllers.procedures.simulate_interview_controller import (
+    router as simulate_router,
+)
 
 
 app = FastAPI(title="Deep Insight API", version="0.1.0")
@@ -41,3 +44,4 @@ app.include_router(employee_router)
 app.include_router(question_router)
 app.include_router(interview_router)
 app.include_router(response_router)
+app.include_router(simulate_router)
