@@ -217,15 +217,52 @@ def test_server(pglite_engine):
 
     app.dependency_overrides[get_session] = get_test_session
 
-    # Create server instance
+    # Create server instance with verbose logging
     config = uvicorn.Config(
-        app=app, host="127.0.0.1", port=port, log_level="error", access_log=False
+        app=app, host="127.0.0.1", port=port, log_level="debug", access_log=True
     )
     server = uvicorn.Server(config)
 
-    # Run server in thread
+    # Run server in thread with real-time logging
     def run_server():
-        asyncio.run(server.serve())
+        try:
+            # Configure logging to show server output in real-time
+            import logging
+            import sys
+            
+            # Clear any existing handlers to avoid duplicates
+            root_logger = logging.getLogger()
+            for handler in root_logger.handlers[:]:
+                root_logger.removeHandler(handler)
+            
+            # Set up a custom formatter for server logs
+            formatter = logging.Formatter('[SERVER] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setFormatter(formatter)
+            handler.setLevel(logging.DEBUG)
+            
+            # Configure root logger to capture everything
+            root_logger.setLevel(logging.DEBUG)
+            root_logger.addHandler(handler)
+            
+            # Configure specific loggers
+            uvicorn_logger = logging.getLogger("uvicorn")
+            uvicorn_logger.setLevel(logging.DEBUG)
+            
+            # Configure app loggers (this will capture our LLM logs)
+            app_logger = logging.getLogger("app")
+            app_logger.setLevel(logging.DEBUG)
+            
+            # Configure our specific service logger
+            service_logger = logging.getLogger("app.services.next_question_service")
+            service_logger.setLevel(logging.DEBUG)
+            
+            print(f"[SERVER] Starting test server on port {port}...", flush=True)
+            print(f"[SERVER] Logger configured - will show LLM integration logs", flush=True)
+            asyncio.run(server.serve())
+        except Exception as e:
+            print(f"[SERVER] Server error: {e}", file=sys.stderr, flush=True)
+            raise
 
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()

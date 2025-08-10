@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List, Optional
 from uuid import UUID, uuid4
@@ -7,6 +8,8 @@ from app.services.schemas.schema import NextQuestionRequest, NextQuestionRespons
 from app.models.models import Interview, Question, QuestionResponse
 from app.db import get_session
 import litellm
+
+logger = logging.getLogger(__name__)
 
 
 class NextQuestionService:
@@ -195,7 +198,8 @@ class NextQuestionService:
     def _generate_question_with_llm(self, conversation_history: List[dict], follow_up_number: int) -> str:
         """Generate a follow-up question using LiteLLM with INTERVIEW_MODEL env var."""
         
-        model = os.getenv("INTERVIEW_MODEL", "openai/gpt-oss-120b")
+        model = os.getenv("INTERVIEW_MODEL", "openrouter/openai/gpt-oss-120b")
+        logger.info(f"Generating follow-up question #{follow_up_number} using model: {model}")
         
         system_prompt = f"""You are an AI interviewer conducting an employee interview. 
 
@@ -235,7 +239,9 @@ Respond with ONLY the question text, no additional formatting or explanation."""
                             if message and hasattr(message, 'content'):
                                 content = getattr(message, 'content', None)
                                 if content and isinstance(content, str):
-                                    return content.strip()
+                                    question_text = content.strip()
+                                    logger.info(f"Successfully generated follow-up question: {question_text[:100]}...")
+                                    return question_text
                 
                 # Alternative parsing for different response formats
                 if hasattr(response, '__dict__'):
@@ -245,7 +251,9 @@ Respond with ONLY the question text, no additional formatting or explanation."""
                         if isinstance(choice, dict) and 'message' in choice and 'content' in choice['message']:
                             content = choice['message']['content']
                             if content and isinstance(content, str):
-                                return content.strip()
+                                question_text = content.strip()
+                                logger.info(f"Successfully generated follow-up question: {question_text[:100]}...")
+                                return question_text
                 
             except (AttributeError, KeyError, IndexError, TypeError, Exception):
                 pass
@@ -254,14 +262,8 @@ Respond with ONLY the question text, no additional formatting or explanation."""
             return "Can you tell me more about that?"
             
         except Exception as e:
-            # Fallback questions for different follow-up numbers
-            fallback_questions = [
-                "Can you tell me more about that?",
-                "What was your experience with that situation?", 
-                "How did that make you feel?",
-                "What would you do differently next time?"
-            ]
-            return fallback_questions[(follow_up_number - 1) % len(fallback_questions)]
+            logger.error(f"Error generating follow-up question: {e}")
+            raise e
 
 
 def get_next_question_service(

@@ -267,7 +267,7 @@ class InterviewService:
     def _generate_question_with_llm(self, conversation_history: List[dict], follow_up_number: int) -> str:
         """Generate a follow-up question using LiteLLM with INTERVIEW_MODEL env var."""
         
-        model = os.getenv("INTERVIEW_MODEL", "openai/gpt-oss-120b")
+        model = os.getenv("INTERVIEW_MODEL", "openrouter/openai/gpt-oss-120b")
         
         system_prompt = f"""You are an AI interviewer conducting an employee interview. 
 

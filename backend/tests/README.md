@@ -1,7 +1,7 @@
 # Deep Insight Backend Tests
 
 Note: If you encounter problems with the node version, you may need to update to the latest version (at least node 22). If you have nvm installed, you can run the following command:
-`nvm install node --reinstall-packages-from=$(nvm current)`
+`nvm install node --reinstall-packages-from=$(nvm current) && nvm alias default node`
 
 Tests are organized into two types:
 - **`/unit`** - Fast unit tests using TestClient (no live server)

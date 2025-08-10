@@ -19,7 +19,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 @router.get("/", response_model=List[Business])
 def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
     return list(
-        session.exec(select(Business).order_by(Business.created_at.asc())).all()
+        session.exec(select(Business).order_by(Business.created_at.asc())).all() # type: ignore
     )
 
 
@@ -44,8 +44,8 @@ def _load_default_seed_data() -> BusinessSeedData:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         # Fallback to minimal default data if file is missing or invalid
         return BusinessSeedData(
-            employees=[{"email": "admin@company.com", "bio": "Default administrator"}],
-            questions=[{"content": "How are you doing today?", "is_follow_up": False}],
+            employees=[{"email": "admin@company.com", "bio": "Default administrator"}], # type: ignore
+            questions=[{"content": "How are you doing today?", "is_follow_up": False}], # type: ignore
         )
 
 

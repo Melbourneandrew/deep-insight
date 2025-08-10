@@ -3,13 +3,14 @@ Long-running integration test for the complete interview flow.
 
 Tests the entire process:
 1. Create business
-2. Add two questions  
+2. Add three base questions  
 3. Add employee
 4. Start interview
-5. Conduct full 6-question interview (2 base + 4 AI-generated follow-ups)
+5. Conduct full interview (3 base questions + 2 AI-generated follow-ups each = 9 total)
 6. Verify interview completion
 
 This test hits real endpoints and may use real LLM calls.
+Expected flow: base -> follow-up -> follow-up -> base -> follow-up -> follow-up -> base -> follow-up -> follow-up
 """
 
 import pytest
@@ -19,11 +20,17 @@ from typing import Dict, Any, Optional
 
 from deep_insight_client import (
     BusinessesApi,
+    CreateBusinessRequest,
+    BusinessSeedData,
     QuestionsApi,
     EmployeesApi,
+    ProceduresApi,
     Business,
     Question,
     Employee,
+    StartInterviewRequest,
+    NextQuestionRequest,
+    AnswerQuestionRequest,
 )
 
 
@@ -46,39 +53,45 @@ class TestFullInterviewFlow:
         businesses_api = BusinessesApi(api_client)
         questions_api = QuestionsApi(api_client)
         employees_api = EmployeesApi(api_client)
-        # Step 1: Create a business
+        procedures_api= ProceduresApi(api_client)
+        
+        
+        # Step 1: Create a business with empty seed data (no default questions/employees)
         print("\n🏢 Step 1: Creating business...")
-        business_data = Business(
-            name="Test Interview Company"
-        )
         
-        created_business = businesses_api.create_business_businesses_post(business=business_data)
+        # Create business with empty seed data to avoid default questions
+        empty_seed_data = BusinessSeedData(employees=[], questions=[])
+        created_business = businesses_api.create_business_businesses_post(
+            create_business_request=CreateBusinessRequest(
+                name="Test Interview Company",
+                seed_data=empty_seed_data
+            )
+        )
         self.business_id = UUID(str(created_business.id))
-        print(f"✅ Created business: {self.business_id}")
+        print(f"✅ Created business: {self.business_id} (with clean slate - no default questions)")
             
-        # Step 2: Add two base questions
+        # Step 2: Add three base questions
         print("\n❓ Step 2: Adding base questions...")
-        question_1_data = Question(
-            content="Tell me about your experience with teamwork and collaboration.",
-            business_id=str(self.business_id),
-            is_follow_up=False
-        )
         
-        created_question_1 = questions_api.create_question_questions_post(question=question_1_data)
-        question_1_id = UUID(str(created_question_1.id))
-        self.question_ids.append(question_1_id)
-        print(f"✅ Created question 1: {question_1_id}")
+        questions_to_create = [
+            "Tell me about your experience with teamwork and collaboration.",
+            "Describe a challenging project you worked on and how you overcame obstacles.",
+            "What are your primary responsibilities in your current role?"
+        ]
         
-        question_2_data = Question(
-            content="Describe a challenging project you worked on and how you overcame obstacles.",
-            business_id=str(self.business_id),
-            is_follow_up=False
-        )
+        for i, question_content in enumerate(questions_to_create, 1):
+            question_data = Question(
+                content=question_content,
+                business_id=str(self.business_id),
+                is_follow_up=False
+            )
+            
+            created_question = questions_api.create_question_questions_post(question=question_data)
+            question_id = UUID(str(created_question.id))
+            self.question_ids.append(question_id)
+            print(f"✅ Created question {i}: {question_id}")
         
-        created_question_2 = questions_api.create_question_questions_post(question=question_2_data)
-        question_2_id = UUID(str(created_question_2.id))
-        self.question_ids.append(question_2_id)
-        print(f"✅ Created question 2: {question_2_id}")
+        print(f"✅ Created {len(questions_to_create)} base questions total")
             
         # Step 3: Add an employee
         print("\n👤 Step 3: Adding employee...")
@@ -94,73 +107,66 @@ class TestFullInterviewFlow:
             
         # Step 4: Start the interview
         print("\n🎯 Step 4: Starting interview...")
-        interview_data = {
-            "employee_id": str(self.employee_id)
-        }
+        start_request = StartInterviewRequest(
+            employee_id=str(self.employee_id)
+        )
         
-        response = client.post("/start-interview/", json=interview_data)
-        assert response.status_code == 201
-        interview_response = response.json()
-        self.interview_id = UUID(interview_response["interview_id"])
+        start_response = procedures_api.start_interview_start_interview_post(start_interview_request=start_request)
+        self.interview_id = UUID(str(start_response.interview_id))
         print(f"✅ Started interview: {self.interview_id}")
             
-        # Step 5: Conduct the full interview (6 questions expected)
+        # Step 5: Conduct the full interview (9 questions expected: 3 base + 6 follow-ups)
         print("\n💬 Step 5: Conducting full interview...")
         
         question_count = 0
-        max_questions = 10  # Safety limit to prevent infinite loops
+        max_questions = 15  # Safety limit to prevent infinite loops
         
         while question_count < max_questions:
             question_count += 1
             print(f"\n--- Question {question_count} ---")
             
             # Get next question
-            next_question_data = {
-                "interview_id": str(self.interview_id)
-            }
+            next_request = NextQuestionRequest(
+                interview_id=str(self.interview_id)
+            )
             
-            response = client.post("/next-question/", json=next_question_data)
-            assert response.status_code == 200
-            
-            next_question_response = response.json()
+            next_question_response = procedures_api.next_question_next_question_post(next_question_request=next_request)
             
             # Check if interview is over
-            if next_question_response["is_interview_over"]:
+            if next_question_response.is_interview_over:
                 print(f"🏁 Interview completed after {question_count - 1} questions")
                 break
             
             # Get the question
-            question = next_question_response["question"]
+            question = next_question_response.question
             assert question is not None
-            question_id = UUID(question["id"])
-            question_content = question["content"]
+            question_id = UUID(str(question.id))
+            question_content = question.content
             
             print(f"📋 Question {question_count}: {question_content}")
             print(f"🆔 Question ID: {question_id}")
-            print(f"🔧 Is follow-up: {question.get('is_follow_up', False)}")
+            print(f"🔧 Is follow-up: {question.is_follow_up}")
             
             # Generate a realistic answer based on the question
             answer = self._generate_test_answer(question_content, question_count)
             print(f"💭 Answer: {answer}")
             
             # Submit the answer
-            answer_data = {
-                "interview_id": str(self.interview_id),
-                "question_id": str(question_id),
-                "content": answer
-            }
+            answer_request = AnswerQuestionRequest(
+                interview_id=str(self.interview_id),
+                question_id=str(question_id),
+                content=answer
+            )
             
-            response = client.post("/answer-question/", json=answer_data)
-            assert response.status_code == 201
-            answer_response = response.json()
-            assert answer_response["success"] is True
+            answer_response = procedures_api.answer_question_answer_question_post(answer_question_request=answer_request)
+            assert answer_response.success is True
             
             # Store the Q&A for analysis
             self.interview_responses.append({
                 "question_number": question_count,
                 "question_id": str(question_id),
                 "question_content": question_content,
-                "is_follow_up": question.get("is_follow_up", False),
+                "is_follow_up": question.is_follow_up,
                 "answer": answer
             })
             
@@ -172,17 +178,30 @@ class TestFullInterviewFlow:
         # Step 6: Verify the interview flow
         print("\n🔍 Step 6: Verifying interview structure...")
         
-        # Should have exactly 6 questions (2 base + 4 AI follow-ups)
-        expected_questions = 6
         actual_questions = len(self.interview_responses)
         
-        print(f"Expected questions: {expected_questions}")
-        print(f"Actual questions: {actual_questions}")
+        # Count base questions and follow-ups
+        base_questions = [q for q in self.interview_responses if not q["is_follow_up"]]
+        follow_up_questions = [q for q in self.interview_responses if q["is_follow_up"]]
         
-        assert actual_questions == expected_questions, f"Expected {expected_questions} questions, got {actual_questions}"
+        num_base_questions = len(base_questions)
+        num_follow_ups = len(follow_up_questions)
         
-        # Verify the question pattern: base -> follow-up -> follow-up -> base -> follow-up -> follow-up
-        expected_pattern = [False, True, True, False, True, True]  # False = base, True = follow-up
+        print(f"Total questions asked: {actual_questions}")
+        print(f"Base questions: {num_base_questions}")
+        print(f"Follow-up questions: {num_follow_ups}")
+        
+        # Verify we have exactly 3 base questions and 6 follow-ups (9 total)
+        expected_base_questions = 3
+        expected_follow_ups = expected_base_questions * 2
+        expected_total = expected_base_questions + expected_follow_ups
+        
+        assert actual_questions == expected_total, f"Expected {expected_total} total questions, got {actual_questions}"
+        assert num_base_questions == expected_base_questions, f"Expected {expected_base_questions} base questions, got {num_base_questions}"
+        assert num_follow_ups == expected_follow_ups, f"Expected {expected_follow_ups} follow-ups, got {num_follow_ups}"
+        
+        # Verify the question pattern: base -> follow-up -> follow-up -> base -> follow-up -> follow-up -> base -> follow-up -> follow-up
+        expected_pattern = [False, True, True, False, True, True, False, True, True]
         actual_pattern = [q["is_follow_up"] for q in self.interview_responses]
         
         print(f"Expected pattern: {expected_pattern}")
@@ -190,29 +209,19 @@ class TestFullInterviewFlow:
         
         assert actual_pattern == expected_pattern, f"Question pattern mismatch. Expected {expected_pattern}, got {actual_pattern}"
         
-        # Verify that we have exactly 2 base questions and 4 follow-ups
-        base_questions = [q for q in self.interview_responses if not q["is_follow_up"]]
-        follow_up_questions = [q for q in self.interview_responses if q["is_follow_up"]]
-        
-        assert len(base_questions) == 2, f"Expected 2 base questions, got {len(base_questions)}"
-        assert len(follow_up_questions) == 4, f"Expected 4 follow-up questions, got {len(follow_up_questions)}"
-        
         print("✅ Interview structure verified correctly!")
         
         # Step 7: Verify interview is actually complete
         print("\n🏁 Step 7: Verifying interview completion...")
         
         # Try to get next question - should indicate interview is over
-        next_question_data = {
-            "interview_id": str(self.interview_id)
-        }
+        final_next_request = NextQuestionRequest(
+            interview_id=str(self.interview_id)
+        )
         
-        response = client.post("/next-question/", json=next_question_data)
-        assert response.status_code == 200
-        
-        final_response = response.json()
-        assert final_response["is_interview_over"] is True
-        assert final_response["question"] is None
+        final_response = procedures_api.next_question_next_question_post(next_question_request=final_next_request)
+        assert final_response.is_interview_over is True
+        assert final_response.question is None
         
         print("✅ Interview completion verified!")
         
@@ -222,8 +231,8 @@ class TestFullInterviewFlow:
         print(f"Employee ID: {self.employee_id}")
         print(f"Interview ID: {self.interview_id}")
         print(f"Total Questions: {len(self.interview_responses)}")
-        print(f"Base Questions: {len(base_questions)}")
-        print(f"AI Follow-ups: {len(follow_up_questions)}")
+        print(f"Base Questions: {num_base_questions}")
+        print(f"AI Follow-ups: {num_follow_ups}")
         
         print("\n📝 Question Flow:")
         for i, q in enumerate(self.interview_responses, 1):
