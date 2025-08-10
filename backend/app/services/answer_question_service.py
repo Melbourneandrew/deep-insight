@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 from fastapi import Depends
 from app.services.schemas.schema import AnswerQuestionRequest, AnswerQuestionResponse
 from app.models.models import Interview, Question, QuestionResponse
@@ -39,17 +39,31 @@ class AnswerQuestionService:
         if question.business_id != interview.business_id:
             raise ValueError("Question and interview must belong to the same business")
 
-        # Create the question response record using the employee from the interview
-        response = QuestionResponse(
-            interview_id=request.interview_id,
-            employee_id=interview.employee_id,
-            question_id=request.question_id,
-            content=request.content,
+        # Check if a response already exists for this combination
+        existing_response_stmt = select(QuestionResponse).where(
+            QuestionResponse.interview_id == request.interview_id,
+            QuestionResponse.employee_id == interview.employee_id,
+            QuestionResponse.question_id == request.question_id
         )
+        existing_response = self.session.exec(existing_response_stmt).first()
 
-        self.session.add(response)
-        self.session.commit()
-        self.session.refresh(response)
+        if existing_response:
+            # Update the existing response content
+            existing_response.content = request.content
+            self.session.commit()
+            self.session.refresh(existing_response)
+        else:
+            # Create a new question response record using the employee from the interview
+            response = QuestionResponse(
+                interview_id=request.interview_id,
+                employee_id=interview.employee_id,
+                question_id=request.question_id,
+                content=request.content,
+            )
+
+            self.session.add(response)
+            self.session.commit()
+            self.session.refresh(response)
 
         return AnswerQuestionResponse(success=True, interview_id=request.interview_id)
 
