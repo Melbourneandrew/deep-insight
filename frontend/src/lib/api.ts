@@ -220,7 +220,7 @@ export const api = {
   },
   procedures: {
     startInterview: (request: StartInterviewRequest) =>
-      fetch(`${API_BASE_URL}/procedures/start-interview`, {
+      fetch(`${API_BASE_URL}/start-interview`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,7 +228,7 @@ export const api = {
         body: JSON.stringify(request),
       }),
     nextQuestion: (request: { interview_id: string }) =>
-      fetch(`${API_BASE_URL}/procedures/next-question`, {
+      fetch(`${API_BASE_URL}/next-question`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,7 +240,7 @@ export const api = {
       question_id: string;
       content: string;
     }) =>
-      fetch(`${API_BASE_URL}/procedures/answer-question`, {
+      fetch(`${API_BASE_URL}/answer-question`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
