@@ -97,3 +97,17 @@ class SimulateInterviewResponse(BaseModel):
     business_name: str
     employee_simulations: List[EmployeeSimulation]
     questions_asked: List[Dict[str, Any]]
+
+
+# Background task response schemas
+class SimulateInterviewBackgroundResponse(BaseModel):
+    message: str
+    business_id: UUID
+    status: str = "started"
+
+
+class SimulateEmployeeInterviewBackgroundResponse(BaseModel):
+    message: str
+    employee_id: UUID
+    interview_id: Optional[UUID] = None
+    status: str = "started"
