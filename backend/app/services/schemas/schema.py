@@ -100,6 +100,20 @@ class SimulateInterviewResponse(BaseModel):
     questions_asked: List[Dict[str, Any]]
 
 
+
+# Background task response schemas
+class SimulateInterviewBackgroundResponse(BaseModel):
+    message: str
+    business_id: UUID
+    status: str = "started"
+
+
+class SimulateEmployeeInterviewBackgroundResponse(BaseModel):
+    message: str
+    employee_id: UUID
+    interview_id: Optional[UUID] = None
+    status: str = "started"
+
 # Build Wiki schemas
 class BuildWikiRequest(BaseModel):
     business_id: UUID
@@ -110,3 +124,4 @@ class BuildWikiResponse(BaseModel):
     business_id: UUID
     sections_plan: Dict[str, Any]
     files_created: List[str]  # List of file paths as strings
+
