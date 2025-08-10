@@ -1,0 +1,522 @@
+employees:
+  - name: Michael Scott
+    role: Regional Manager
+    team: Sales
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          I lead the Scranton branch, set sales targets, coach the sales team, and ensure we
+          hit quarterly revenue goals while keeping morale high. I also own territory design,
+          hiring decisions in partnership with HR, quarterly planning with Finance, and the
+          executive relationship with our top 10 accounts in the region.
+      - question: Which projects are you focused on right now?
+        answer: >
+          I am driving a key account growth initiative for regional clients, a referral
+          program to expand into local small businesses, and a hygiene project to improve CRM
+          data quality and stage hygiene. We are also piloting a light-weight MEDDICC
+          qualification to improve forecast accuracy.
+      - question: Describe your day-to-day workflow.
+        answer: >
+          I start with a quick floor walk to check energy, then review the pipeline and
+          forecast, identify stuck deals, and assign next steps. Before lunch I handle rep
+          coaching, escalations, and deal desk approvals. Afternoons are reserved for client
+          calls, QBR prep, and recruiting screens. I end the day by updating the forecast and
+          sending a short notes summary to the leadership channel.
+      - question: What recurring meetings do you attend?
+        answer: >
+          I run the Monday sales huddle at 9:30 AM, the Wednesday branch update at 3 PM, and
+          a Friday forecast review with finance. Monthly I host a pipeline scrub with Sales
+          Ops and a customer advisory call for our top accounts.
+      - question: What teams or tools do you rely on?
+        answer: >
+          Sales Operations for territory and quota, Customer Service for post-sale quality,
+          and Marketing for top-of-funnel. I rely on our CRM (pipeline, forecasts, activity
+          logs), the quoting tool for discount approvals, and Finance dashboards for revenue
+          pacing and mix.
+      - question: How do you measure success for your team?
+        answer: >
+          Revenue vs plan, weighted pipeline coverage (3x for the next quarter), win rate by
+          segment, average cycle time, stage-by-stage conversion, and new logo adds. I also
+          track coaching health (1:1 completion rate), forecast accuracy (within 5%), and
+          customer retention for top accounts.
+      - question: If someone needs a quick decision from you, what is the best way to reach you?
+        answer: >
+          Slack first, then a quick desk pop-in. For approvals, attach the context and link
+          the CRM opportunity. If I’m in a meeting, use the “Needs-Approval” channel with a
+          clear yes/no ask and deadline.
+      - question: What are the top risks to hitting quota this quarter?
+        answer: >
+          Concentration risk in two large renewals, longer-than-expected cycles in public
+          sector, and discount pressure from a new competitor. We are mitigating through
+          early exec alignment, proof-of-value pilots, and strict discount guardrails.
+      - question: What discount approval thresholds do you use?
+        answer: >
+          Reps can approve up to 10% with a justified note. 11–20% needs my approval with a
+          competing quote attached. Over 20% requires Finance sign-off and a give-get list
+          (multi-year, prepay, volume). No custom terms without Legal.
+      - question: What does your sales process look like stage-by-stage?
+        answer: |
+          - Stage 1: Discovery — MEDDICC light fields required, next meeting booked
+          - Stage 2: Solution Fit — demo completed, mutual success plan drafted
+          - Stage 3: Proposal — pricing shared, redlines started if needed
+          - Stage 4: Commit — verbal yes, paper in flight, target close date set
+          - Closed Won/Lost — win/loss reason captured with 3 bullet specifics
+      - question: Where do handoffs commonly fail?
+        answer: >
+          Missed context during the Sales to CS transition. We now require attaching the
+          mutual success plan and confirming owner/backup in the handoff checklist.
+      - question: What documentation do you rely on and where is it stored?
+        answer: >
+          Process wiki in the company knowledge base, deal desk SOPs in Google Drive, and
+          dashboards embedded in the CRM home. I expect pages updated monthly by the owner.
+      - question: What would make your job easier next quarter?
+        answer: >
+          Better lead scoring from Marketing, automated discount guardrails in the quoting
+          tool, and a tighter weekly forecast discipline anchored on exit criteria.
+
+  - name: Jim Halpert
+    role: Account Executive
+    team: Sales
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          I manage a book of mid-market clients, handle renewals and upsells, prospect new
+          regional accounts, and drive opportunities from discovery to close using our
+          standard playbooks.
+      - question: Which projects are you focused on right now?
+        answer: >
+          A cross-sell campaign for sustainable paper products, a referral workflow pilot
+          with Marketing, and tightening proposal SLAs to 24 hours for in-cycle deals.
+      - question: Describe your day-to-day workflow.
+        answer: >
+          Mornings are for prospecting and email follow-ups; mid-day I run demos and
+          proposal reviews; late afternoons I prepare quotes, update the CRM, and confirm
+          next steps with champions. Friday I send a concise weekly update to my manager.
+      - question: What recurring meetings do you attend?
+        answer: >
+          Monday sales huddle, a Tuesday product enablement sync at 11 AM, and a Thursday
+          account strategy session with my pod.
+      - question: What teams or tools do you rely on?
+        answer: >
+          Sales Ops for pricing approvals, Customer Service for post-sale handoffs, and
+          Marketing for campaigns. I live in the CRM, the quoting tool, and use email
+          sequences and a dialer for outreach.
+      - question: What does a great week look like?
+        answer: |
+          - 2 net-new meetings booked
+          - 1 expansion opportunity progressed a stage
+          - Proposal turnaround under 24 hours
+          - Inbox at zero by Friday
+      - question: How do you prepare for demos?
+        answer: >
+          I research the account, confirm the buyer roles, map pains to three product
+          capabilities, and pre-build a short scenario using prospect data so the demo feels
+          specific. I also prepare 3 discovery questions tied to value levers and a mutual
+          next step.
+      - question: Who is your ICP and what objections do you expect?
+        answer: >
+          Mid-market office managers and procurement leads. Objections: cost vs commodity,
+          switching friction, and delivery reliability. I counter with total cost of
+          ownership, white-glove onboarding, and on-time metrics with references.
+      - question: What deal desk and discount rules do you follow?
+        answer: >
+          I can approve up to 10% with justification. Above that I attach the business case
+          and competing quote, then route for manager approval. I avoid discounting unless I
+          get a give-get like multi-year, volume, or reference.
+      - question: What exit criteria do you use by stage?
+        answer: |
+          - Discovery: champion identified, pain quantified, next meeting set
+          - Fit: problem-solution alignment documented, success metrics defined
+          - Proposal: pricing shared, legal/terms owner identified
+          - Commit: verbal yes, redlines in motion, target close date confirmed
+      - question: What data must be in the CRM before you move a stage?
+        answer: >
+          MEDDICC light fields, primary contact, buying committee roles, next step with
+          date, and a mutual success plan link at Proposal and beyond.
+
+  - name: Pam Beesly
+    role: Office Administrator
+    team: Operations
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          I manage front office operations, coordinate calendars, support onboarding, and
+          keep branch facilities and supplies running smoothly. I also maintain the vendor
+          list and keep lobby and meeting room standards.
+      - question: Which projects are you focused on right now?
+        answer: >
+          Organizing a client open house, standardizing visitor check-in, and updating the
+          onboarding checklist with IT and HR to reduce day-one issues.
+      - question: Describe your day-to-day workflow.
+        answer: >
+          I greet visitors, process mail, handle purchase requests, keep meeting rooms
+          scheduled, and help team members with admin needs as they come up. I aim to clear
+          the admin request queue before noon and batch vendor follow-ups at 3 PM.
+      - question: What recurring meetings do you attend?
+        answer: >
+          Wednesday branch update, a Thursday operations coordination at 10 AM, and a
+          monthly facilities review with vendors.
+      - question: What teams or tools do you rely on?
+        answer: >
+          HR for onboarding tickets, IT for equipment requests; calendar system for rooms,
+          badge printer, and the supply ordering portal with par levels.
+      - question: What do you escalate and to whom?
+        answer: >
+          Facility issues to vendor contacts, equipment requests to IT, HR matters to the HR
+          business partner, and anything customer-facing to the relevant team manager.
+      - question: How should admin requests be submitted?
+        answer: >
+          Use the office admin request form with urgency and due date. For urgent issues,
+          call the front desk and tag the request as Priority.
+      - question: What are your par levels and reorder rules for supplies?
+        answer: |
+          - Paper: reorder at 30% remaining; standard 2-week lead time
+          - Badges: reorder when down to 50 blanks
+          - Coffee/tea: weekly count, reorder every Monday
+      - question: What is the onboarding checklist for new hires?
+        answer: |
+          1. Badge and desk setup (day 0)
+          2. Equipment pickup with IT (day 1)
+          3. Orientation calendar invite and office tour (day 1)
+          4. Admin request walkthrough (day 1)
+
+  - name: Dwight Schrute
+    role: Assistant to the Regional Manager
+    team: Sales
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Support the Regional Manager, enforce sales process discipline, manage key
+          territory accounts, and ensure operational readiness including safety procedures.
+      - question: Which projects are you focused on right now?
+        answer: |
+          - Territory coverage model refresh
+          - Competitive battlecard updates
+          - Safety drill documentation and training
+      - question: Describe your day-to-day workflow.
+        answer: |
+          7:45 AM floor check; 8:30 AM pipeline audit; 10 AM prospecting block; after
+          lunch client follow-ups; late afternoon account planning or on-site visits.
+      - question: What recurring meetings do you attend?
+        answer: Sales huddle, operations sync, and quarterly safety reviews.
+      - question: What teams or tools do you rely on?
+        answer: CRM, call recorder, territory planner spreadsheet, and policy wiki.
+      - question: What are the safety procedures you enforce?
+        answer: |
+          - Quarterly evacuation drills with headcount verification
+          - Forklift certification checks and refresher training
+          - Incident reporting within 24 hours using the safety form
+      - question: How are territories segmented?
+        answer: >
+          By zip code clusters, balanced on revenue and active account density. I review
+          quarterly and adjust for coverage and travel efficiency.
+      - question: What KPIs do you monitor daily?
+        answer: >
+          Activities to meeting ratio, pipeline hygiene (overdue next steps), and red deals
+          without executive alignment.
+
+  - name: Stanley Hudson
+    role: Sales Representative
+    team: Sales
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Manage existing accounts, handle renewals efficiently, and protect margin on
+          repeat orders.
+      - question: Which projects are you focused on right now?
+        answer: >
+          Retention push for legacy accounts and streamlining reorder schedules so clients
+          can auto-purchase with less friction.
+      - question: Describe your day-to-day workflow.
+        answer: >
+          Morning check of order statuses, mid-day client calls, afternoon quote
+          confirmations, then update the CRM and call it a day.
+      - question: What recurring meetings do you attend?
+        answer: Monday sales huddle and a monthly account review.
+      - question: What teams or tools do you rely on?
+        answer: CRM, email templates, and the quoting tool.
+      - question: What is your renewal playbook?
+        answer: |
+          - 90/60/30/14-day touchpoints with value recap
+          - Confirm procurement timelines and paper specs
+          - Offer early-renewal incentive tied to volume commitment
+      - question: What are top churn risks you watch for?
+        answer: >
+          Declining order frequency, late payers, and new buyer changes. I flag these in the
+          CRM and loop in my manager early.
+
+  - name: Phyllis Vance
+    role: Sales Representative
+    team: Sales
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Maintain key customer relationships, coordinate samples, and ensure timely
+          proposals tailored to client needs.
+      - question: Which projects are you focused on right now?
+        answer: |
+          - Seasonal catalog outreach
+          - Client appreciation events planning
+          - Renewals playbook refresh
+      - question: Describe your day-to-day workflow.
+        answer: >
+          Balance between customer check-ins, proposal prep, and drop-ins when needed. I
+          keep a weekly route for in-person visits and send handwritten notes after major
+          meetings.
+      - question: What recurring meetings do you attend?
+        answer: Sales standup, biweekly marketing sync, and quarterly customer advisory calls.
+      - question: What teams or tools do you rely on?
+        answer: CRM, sample tracker sheet, and calendar.
+      - question: How do you handle samples logistics?
+        answer: >
+          I log samples with SKU, date, and requester, track delivery, and follow up within
+          72 hours for feedback. If requested, I include a small usage guide.
+
+  - name: Angela Martin
+    role: Senior Accountant
+    team: Accounting
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Month-end close, accounts reconciliation, expense policy enforcement, audit
+          readiness, and ensuring segregation of duties.
+      - question: Which projects are you focused on right now?
+        answer: |
+          1. Close checklist automation
+          2. T&E policy update
+          3. Vendor master cleanup
+      - question: Describe your day-to-day workflow.
+        answer: |
+          1. Review prior-day entries
+          2. Reconcile priority accounts
+          3. Approve expenses and advise on policy
+      - question: What recurring meetings do you attend?
+        answer: Accounting standup, finance review, and quarterly audits.
+      - question: What teams or tools do you rely on?
+        answer: ERP, bank portal, spreadsheets with reconciliation templates, and the policy repository.
+      - question: What is your month-end close calendar and materiality threshold?
+        answer: >
+          Day 0–5: subledger close and reconciliations; Day 6–7: review and adjustments;
+          Day 8: leadership sign-off. Materiality: $2,500 for reclasses; $10,000 for accruals.
+      - question: What controls do you operate?
+        answer: >
+          Three-way match for payables, segregation of duties for journal entries, and
+          monthly bank reconciliation review with sign-off.
+
+  - name: Oscar Martinez
+    role: Accountant
+    team: Accounting
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Financial analysis, budgeting support, and preparing variance explanations for
+          leadership.
+      - question: Which projects are you focused on right now?
+        answer: >
+          Rolling forecast improvements and a simplified P&L view for non-finance managers.
+      - question: Describe your day-to-day workflow.
+        answer: >
+          Data pulls in the morning, meetings mid-day, analysis work in the afternoon, and
+          a summary note to Finance by end of day.
+      - question: What recurring meetings do you attend?
+        answer: |
+          - Weekly finance standup
+          - Department budget reviews
+          - Ad hoc project syncs
+      - question: What teams or tools do you rely on?
+        answer: ERP, BI dashboards, and spreadsheet models.
+      - question: What variance threshold triggers investigation?
+        answer: >
+          Over 5% or $5,000, whichever is greater, triggers a deep dive with commentary and
+          owner follow-up.
+      - question: What assumptions drive your rolling forecast?
+        answer: >
+          Seasonality from historical trends, promotion calendar from Marketing, and
+          retention rates by segment. I keep a shared assumptions tab.
+
+  - name: Kelly Kapoor
+    role: Customer Service Representative
+    team: Customer Service
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Customer inquiries, order status updates, and coordinating with Sales to ensure
+          smooth handoffs.
+      - question: Which projects are you focused on right now?
+        answer: |
+          - FAQ refresh for the help center
+          - Response time reduction initiative
+          - Post-order NPS follow-up flow
+      - question: Describe your day-to-day workflow.
+        answer: >
+          Ticket triage, customer callbacks, and documenting resolutions. I tag tickets with
+          categories so we can trend issues for ops and product.
+      - question: What recurring meetings do you attend?
+        answer: Support standup and a weekly cross-functional case review.
+      - question: What teams or tools do you rely on?
+        answer: Helpdesk, phone system, canned responses library, and CRM.
+      - question: What are your SLAs and escalation paths?
+        answer: |
+          - First response: 1 business hour
+          - Resolution target: same day for simple, 2 days for complex
+          - Escalations: late shipments to Warehouse, pricing issues to Sales Ops
+      - question: What are the most common root causes you see?
+        answer: >
+          Address entry errors, inventory mismatches, and unclear delivery windows. We are
+          piloting better address validation and clearer order confirmations.
+
+  - name: Toby Flenderson
+    role: HR Representative
+    team: Human Resources
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Employee relations, policy guidance, and compliance training.
+      - question: Which projects are you focused on right now?
+        answer: >
+          Updating onboarding materials and rolling out harassment prevention training.
+      - question: Describe your day-to-day workflow.
+        answer: |
+          Morning inbox and case review, mid-day employee meetings, afternoon policy
+          documentation and follow-ups.
+      - question: What recurring meetings do you attend?
+        answer: HR standup, manager office hours, and quarterly compliance review.
+      - question: What teams or tools do you rely on?
+        answer: HRIS, training LMS, and policy wiki.
+      - question: What is your performance review cycle?
+        answer: >
+          Semi-annual reviews with calibrated ratings. Managers submit drafts two weeks prior
+          and we conduct calibration sessions the week before delivery.
+      - question: How do you handle employee relations investigations?
+        answer: >
+          Intake, impartial interviews, evidence review, findings write-up, and action plan.
+          Documentation is stored confidentially in the HRIS case module.
+
+  - name: Creed Bratton
+    role: Quality Assurance
+    team: Quality
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Spot checks on product quality, documentation of defects, and reporting trends to
+          operations.
+      - question: Which projects are you focused on right now?
+        answer: |
+          - Incoming shipment sampling
+          - Packaging checklist updates
+      - question: Describe your day-to-day workflow?
+        answer: >
+          Walk the floor, sample, note issues, file reports. If defect rates exceed
+          thresholds, I alert operations and log a CAPA item.
+      - question: What recurring meetings do you attend?
+        answer: Quality review and monthly vendor scorecard.
+      - question: What teams or tools do you rely on?
+        answer: Inspection forms, photo log, and spreadsheets.
+      - question: What sampling plan do you use and how do you classify defects?
+        answer: >
+          AQL 1.0 for standard lots; critical, major, minor defects with thresholds of 0/2.5/4.0.
+          I attach photos with measurements for any major or critical defects.
+
+  - name: Darryl Philbin
+    role: Warehouse Foreman
+    team: Warehouse
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Oversee warehouse operations, safety compliance, on-time loading, and staffing for
+          each shift.
+      - question: Which projects are you focused on right now?
+        answer: |
+          - Slotting optimization for fast movers
+          - Forklift maintenance schedule refresh
+          - Receiving dock throughput study
+      - question: Describe your day-to-day workflow.
+        answer: |
+          1. Shift kickoff and safety brief
+          2. Assign lanes and priorities
+          3. Mid-shift audit and adjustments
+      - question: What recurring meetings do you attend?
+        answer: Operations standup and weekly safety committee.
+      - question: What teams or tools do you rely on?
+        answer: WMS, handheld scanners, and radio comms.
+      - question: What KPIs do you track?
+        answer: |
+          - On-time shipments (% by lane)
+          - Picks per labor hour
+          - Dock-to-stock time
+          - Incident-free days
+      - question: How do you decide slotting?
+        answer: >
+          ABC velocity ranking, unit size, and pick path optimization. I review monthly and
+          after any large catalog changes.
+
+  - name: Erin Hannon
+    role: Receptionist
+    team: Operations
+    location: Scranton Branch
+    qa:
+      - question: What are your primary responsibilities?
+        answer: >
+          Front desk coverage, call routing, visitor management, and light admin support.
+      - question: Which projects are you focused on right now?
+        answer: >
+          Improving visitor signage and updating the phone routing guide.
+      - question: Describe your day-to-day workflow.
+        answer: |
+          Open the front desk, check voicemails, greet visitors, route calls, and log
+          deliveries.
+      - question: What recurring meetings do you attend?
+        answer: Office operations sync and monthly facilities review.
+      - question: What teams or tools do you rely on?
+        answer: Phone system, calendar, and the visitor log.
+      - question: What does your call routing decision tree look like?
+        answer: |
+          - Orders and status: Customer Service queue
+          - New business: Sales queue
+          - Vendor or facilities: Operations
+          - HR matters: HR shared line
+  
+  - name: Jan Levinson
+    role: VP, Corporate Strategy
+    team: Corporate
+    location: Corporate HQ
+    qa:
+      - question: What market do we operate in and how is it changing?
+        answer: >
+          Dunder Mifflin serves the North American office paper and supplies market,
+          focused on SMB and mid-market buyers who value service and reliability over
+          pure price. Secular decline in copy paper is offset by growth in specialty
+          papers, packaging materials, and sustainability-certified SKUs. Our moat is
+          regional service, relationship sales, and on-time delivery.
+      - question: Who are our customers and ideal segments?
+        answer: >
+          Core customers are office managers, procurement leads, and operations teams at
+          50–1,000 employee companies. Ideal segments are professional services, education,
+          healthcare clinics, and light manufacturing with recurring usage and multi-site
+          needs. Buying committee typically includes an office manager (user), procurement
+          (economic), and a department lead (sponsor).
+      - question: What are corporate priorities this fiscal year?
+        answer: |
+          1. Mix shift: +8% of revenue from higher-margin specialty and sustainable SKUs
+          2. Net revenue retention: ≥102% via cross-sell and upsell playbooks
+          3. Delivery excellence: on-time-in-full (OTIF) ≥ 97% across regions
+          4. New logos: expand mid-market presence in education and healthcare
+      - question: What KPIs do we track at the business level?
+        answer: |
+          - Revenue growth % (YoY and QoQ)
+          - Gross margin % and contribution margin per SKU family
+          - Net revenue retention (NRR) and churn rate
+          - New logos and pipeline coverage (≥3x next quarter target)
+          - On-time-in-full (OTIF) and customer NPS
