@@ -1,5 +1,6 @@
 """Interview service for managing interview workflow and logic."""
 
+import logging
 import os
 from typing import List, Optional
 from uuid import UUID, uuid4
@@ -7,6 +8,8 @@ from sqlmodel import Session, select
 
 from app.models.models import Interview, Question, QuestionResponse, Employee
 import litellm
+
+logger = logging.getLogger(__name__)
 
 
 class InterviewService:
@@ -319,21 +322,16 @@ Respond with ONLY the question text, no additional formatting or explanation."""
                             if content and isinstance(content, str):
                                 return content.strip()
                 
-            except (AttributeError, KeyError, IndexError, TypeError, Exception):
-                pass
+            except (AttributeError, KeyError, IndexError, TypeError, Exception) as parse_error:
+                logger.error(f"Failed to parse follow-up question response: {parse_error}")
+                raise ValueError(f"Failed to parse follow-up question response: {parse_error}")
             
-            # Fallback if response parsing fails
-            return "Can you tell me more about that?"
+            # If we reach here, parsing failed but no exception was caught
+            raise ValueError("Failed to parse LLM response - no valid content found")
             
         except Exception as e:
-            # Fallback questions for different follow-up numbers
-            fallback_questions = [
-                "Can you tell me more about that?",
-                "What was your experience with that situation?", 
-                "How did that make you feel?",
-                "What would you do differently next time?"
-            ]
-            return fallback_questions[(follow_up_number - 1) % len(fallback_questions)]
+            logger.error(f"Error generating follow-up question: {e}")
+            raise e
 
 
 # Global service instance
