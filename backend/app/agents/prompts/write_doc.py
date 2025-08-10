@@ -32,6 +32,40 @@ Create a complete, professional markdown document that synthesizes the relevant 
 - Include horizontal rules (---) to separate major sections
 - **Important for MkDocs compatibility**: Use 4 spaces for nested bullet point indentation (not 2 spaces or tabs)
 
+### Mermaid Diagrams
+When creating organizational charts or process flows, use mermaid diagrams following these guidelines:
+- **Use proper syntax**: Start with graph direction (TD for top-down, LR for left-right)
+- **Clear node names**: Use descriptive labels in square brackets
+- **Proper relationships**: Use --> for reporting/direct relationships, -.-> for collaborative/dotted relationships
+- **Visual styling**: Add classDef for different team types and apply with class statements
+- **Hierarchical structure**: For org charts, use TD (top-down) layout with CEO/leadership at top
+
+**Example organizational chart with proper syntax:**
+```mermaid
+graph TD
+    CEO["Chief Executive Officer"]
+    SalesDir["Sales Director"]
+    ProductDir["Product Director"]
+    SalesRep["Sales Representative"]
+    
+    CEO --> SalesDir
+    CEO --> ProductDir
+    SalesDir --> SalesRep
+    
+    classDef leadership fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef sales fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    
+    class CEO,SalesDir leadership
+    class SalesRep sales
+```
+
+#### Common Syntax Errors to Avoid
+- **DON'T**: Mix node definition with relationships in same line
+- **DON'T**: Use parentheses in node labels without quotes
+- **DON'T**: Use \n for line breaks (use `<br/>` instead)
+- **DON'T**: Forget to define nodes before using them in relationships
+- **DON'T**: Use spaces or special characters in node IDs
+
 ### What NOT to Include
 - Don't create fictional information not found in the Q&A data
 - Don't include personal opinions or speculation
@@ -63,7 +97,7 @@ If you are writing a "Business Overview" document, follow this specific structur
 #### <Company Name> Overview Section
 - **About Us** - Clear description of the business, its mission, and core purpose
 - **Market Impact** - Target customers and competitive advantages
-- **Strategic priorities (12 mo)** - Key strategic initiatives for the next 12 months
+- **Strategic priorities (12 mo)** - Key strategic initiatives for the next 12 months (5 max)
 - **Core KPIs** - Primary metrics that measure business success
 
 #### Customers & GTM Section
@@ -72,7 +106,7 @@ If you are writing a "Business Overview" document, follow this specific structur
 - **Top customers/logos** - Key customers and notable client logos
 
 #### People & Org Section
-- **Org chart** - Organizational structure (use mermaid diagram if employee data supports it)
+- **Org chart** - Organizational structure using mermaid diagram with proper TD (top-down) layout, clear reporting relationships (-->), collaborative relationships (-.->), and visual styling with classDef
 - **Headcount by function** - Team sizes and distribution across departments
 
 This should be written as a high-level company overview that helps new employees and stakeholders understand the business structure, strategy, and operations.
@@ -97,7 +131,7 @@ Description of the main topic...
 
 ### Process B
 - Point one
-    - Sub-point with 4-space indentation
+    - Sub-point with 4-space indentation (IMPORTANT: 4 spaces, not 2 or tabs)
     - Another sub-point
 - Point two
     - Nested detail with proper spacing
