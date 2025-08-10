@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api, NextQuestionResponse, AnswerQuestionResponse } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import DeepInsightLogo from "@/app/DeepInsightLogo";
 import PromptInput from "./PromptInput";
 
 export default function InterviewQuestionPage() {
@@ -93,10 +94,13 @@ export default function InterviewQuestionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading question...</p>
+      <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <div className="text-center flex flex-col items-center">
+          <div className="relative flex items-center justify-center w-16 h-16 mb-4">
+            <div className="absolute inset-0 rounded-full border-2 border-blue-200 border-t-blue-500 animate-spin"></div>
+            <DeepInsightLogo size={24} className="text-blue-600" />
+          </div>
+          <p className="text-gray-600">Loading next question...</p>
         </div>
       </div>
     );

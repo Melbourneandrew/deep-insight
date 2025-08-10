@@ -109,6 +109,7 @@ def get_business_interview_details(
             .join(Question, QuestionResponse.question_id == Question.id)
             .join(Employee, QuestionResponse.employee_id == Employee.id)
             .where(QuestionResponse.interview_id == interview.id)
+            .order_by(Question.order_index)
         )
 
         responses_with_details = session.exec(response_statement).all()

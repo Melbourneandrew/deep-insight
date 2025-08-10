@@ -21,6 +21,13 @@ export interface CreateBusinessRequest {
   seed_data?: BusinessSeedData;
 }
 
+// Business response type
+export interface Business {
+  id: string;
+  name: string;
+  created_at?: string;
+}
+
 // Types for interview procedures
 export interface NextQuestionRequest {
   interview_id: string;
@@ -220,7 +227,7 @@ export const api = {
   },
   procedures: {
     startInterview: (request: StartInterviewRequest) =>
-      fetch(`${API_BASE_URL}/start-interview`, {
+      fetch(`${API_BASE_URL}/start-interview/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,7 +235,7 @@ export const api = {
         body: JSON.stringify(request),
       }),
     nextQuestion: (request: { interview_id: string }) =>
-      fetch(`${API_BASE_URL}/next-question`, {
+      fetch(`${API_BASE_URL}/next-question/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -241,6 +248,14 @@ export const api = {
       content: string;
     }) =>
       fetch(`${API_BASE_URL}/answer-question`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }),
+    buildWiki: (request: { business_id: string }) =>
+      fetch(`${API_BASE_URL}/build-wiki`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

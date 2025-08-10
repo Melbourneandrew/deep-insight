@@ -152,6 +152,38 @@ class NextQuestionService:
 
         return 0  # Default to first question if not found
 
+    def _calculate_follow_up_order_index(
+        self, responses: List[QuestionResponse], follow_up_number: int
+    ) -> int:
+        """Calculate the order_index for a follow-up question.
+
+        Follow-ups are placed in the slots between scripted questions:
+        - Scripted questions: 0, 3, 6, 9, ...
+        - Follow-up slots: 1-2, 4-5, 7-8, ...
+        """
+        # Find the most recent base question to determine which slot we're in
+        base_question_order_index = None
+
+        for response in reversed(responses):
+            question = self.session.get(Question, response.question_id)
+            if (
+                question
+                and not question.is_follow_up
+                and question.order_index is not None
+            ):
+                base_question_order_index = question.order_index
+                break
+
+        # Default to first base question if none found
+        if base_question_order_index is None:
+            base_question_order_index = 0
+
+        # Calculate follow-up order_index: base + follow_up_number
+        # For base question at index 0: follow-ups go to 1, 2
+        # For base question at index 3: follow-ups go to 4, 5
+        # For base question at index 6: follow-ups go to 7, 8
+        return base_question_order_index + follow_up_number
+
     def _generate_follow_up_question(
         self,
         responses: List[QuestionResponse],
@@ -168,13 +200,18 @@ class NextQuestionService:
             conversation_history, follow_up_number
         )
 
+        # Calculate the order_index for this follow-up question
+        follow_up_order_index = self._calculate_follow_up_order_index(
+            responses, follow_up_number
+        )
+
         # Create and save the generated question
         generated_question = Question(
             id=uuid4(),
             content=question_content,
             business_id=interview.business_id,
             is_follow_up=True,
-            order_index=None,  # Follow-ups don't have order indices
+            order_index=follow_up_order_index,
         )
 
         self.session.add(generated_question)

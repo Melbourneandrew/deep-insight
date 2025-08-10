@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { api, CreateBusinessRequest } from "@/lib/api";
+import { api, CreateBusinessRequest, Business } from "@/lib/api";
 
 interface CreateBusinessModalProps {
   onBusinessCreated: () => void;
@@ -70,6 +71,7 @@ const generateRandomBusinessName = () => {
 export default function CreateBusinessModal({
   onBusinessCreated,
 }: CreateBusinessModalProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -95,10 +97,15 @@ export default function CreateBusinessModal({
         throw new Error("Failed to create business");
       }
 
+      const business: Business = await response.json();
+
       // Reset form and close modal
-      setFormData({ name: "" });
+      setFormData({ name: generateRandomBusinessName() });
       setOpen(false);
       onBusinessCreated();
+
+      // Navigate to the newly created business page
+      router.push(`/businesses/${business.id}`);
     } catch (error) {
       console.error("Error creating business:", error);
       // You could add a toast notification here
