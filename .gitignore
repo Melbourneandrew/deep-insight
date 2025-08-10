@@ -1,2 +1,10 @@
 *docs-venv/
-*__pycache__/
+node_modules
+.next
+.env
+.env.*
+openapi.json
+__pycache__
+**/__pycache__
+frontend/src/api
+deep-insight-client

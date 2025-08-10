@@ -1,0 +1,43 @@
+{
+  "employees": [
+    {
+      "email": "jim.halpert@apexdynamics.io",
+      "bio": "Sales Representative with a knack for pranks and an impressive ability to close deals while maintaining a laid-back attitude. Co-Regional Manager with innovative sales strategies."
+    },
+    {
+      "email": "pam.beesly@nexusventures.co",
+      "bio": "Office Administrator and aspiring artist. Expert in reception duties, office management, and maintaining sanity in a chaotic workplace. Recently promoted to Office Administrator."
+    },
+    {
+      "email": "dwight.schrute@quantumsystems.net",
+      "bio": "Assistant Regional Manager and beet farmer. Dedicated salesperson with unmatched loyalty to the company and an encyclopedic knowledge of survival tactics and martial arts."
+    },
+    {
+      "email": "michael.scott@phoenixenterprises.com",
+      "bio": "Regional Manager with 15+ years experience. World's Best Boss according to his mug. Specializes in relationship building, comedy, and making the workplace feel like family."
+    },
+    {
+      "email": "stanley.hudson@velocityholdings.biz",
+      "bio": "Sales Representative with a passion for crossword puzzles and Florida retirement planning. Brings steady, reliable performance and an appreciation for pretzel day."
+    }
+  ],
+  "questions": [
+    {
+      "content": "What is your role?",
+      "is_follow_up": false,
+      "order_index": 0
+    },
+    {
+      "content": "Tell me about the projects you work on",
+      "is_follow_up": false
+    },
+    {
+      "content": "Who do you meet with and what do you talk about?",
+      "is_follow_up": false
+    },
+    {
+      "content": "What are the primary resources that you use to do your job effectively?",
+      "is_follow_up": false
+    }
+  ]
+}

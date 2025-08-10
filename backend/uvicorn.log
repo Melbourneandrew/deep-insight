@@ -608,3 +608,186 @@ OSError: [Errno 9] Bad file descriptor
 
 Current thread 0x000000020b06e0c0 (most recent call first):
   <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/employee_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/question_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/response_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/question_controller.py', 'app/controllers/employee_controller.py', 'app/controllers/response_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/employee_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/interview_controller.py', 'app/controllers/question_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/response_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/interview_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/interview_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/services/schemas/schema.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/services/schemas/schema.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/controllers/business_controller.py', 'app/services/schemas/schema.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020b06e0c0 (most recent call first):
+  <no Python frame>
+INFO:     Stopping reloader process [67038]

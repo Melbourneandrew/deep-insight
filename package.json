@@ -1,0 +1,27 @@
+{
+  "name": "deep-insight",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "gen:init": "cd backend && python -m scripts.save_api_schema",
+    "gen:backend": "npx @openapitools/openapi-generator-cli generate -i openapi.json -g python -o ./deep-insight-client --package-name=deep_insight_client && sed -i '' 's/license = \"NoLicense\"/license = {text = \"NoLicense\"}/g' ./deep-insight-client/pyproject.toml && cd backend && poetry remove deep-insight-client && poetry add ../deep-insight-client",
+    "gen:frontend": "npx @openapitools/openapi-generator-cli generate -i openapi.json -g typescript-fetch -o ./frontend/src/api --additional-properties=npmName=deep-insight-api-client,npmVersion=1.0.0,withoutRuntimeChecks=true",
+    "gen": "npm run gen:init && concurrently \"npm run gen:backend\" \"npm run gen:frontend\"",
+    "test": "cd backend && python -m pytest",
+    "test:verbose": "cd backend && python -m pytest -v -s",
+    "test:unit": "cd backend && python -m pytest tests/unit/ -v",
+    "test:live": "cd backend && python -m pytest tests/live/ -v",
+    "test:unit:watch": "cd backend && ptw tests/unit/ --poll",
+    "test:live:watch": "cd backend && ptw tests/live/ --poll",
+    "test:employee": "cd backend && python -m pytest tests/unit/test_employee_crud.py -v"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.21.4"
+  }
+}
