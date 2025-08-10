@@ -10,7 +10,8 @@ You will receive employee Q&A data containing:
 Analyze the Q&A responses to create a CONCISE navigation structure with strict limits:
 
 **STRICT REQUIREMENTS:**
-- Maximum 5 sections total
+- MUST include a "Business Overview" section as the FIRST section with EXACTLY ONE document titled "Business Overview" that goes to "index.md"
+- Maximum 5 sections total (including Business Overview)
 - Maximum 10 documents total across all sections
 - Focus only on the most important, high-level themes
 - Combine related topics into broader sections
@@ -26,6 +27,15 @@ Return a JSON structure with this exact format:
 ```json
 {
   "sections": [
+    {
+      "section_name": "Business Overview",
+      "docs": [
+        {
+          "title": "Business Overview",
+          "doc_filepath": "index.md"
+        }
+      ]
+    },
     {
       "section_name": "Section Name",
       "docs": [
@@ -73,7 +83,9 @@ Create broad, consolidated sections that group related information:
 4. **Create hierarchy** that supports user journeys
 5. **Ensure coverage** of all important topics
 
-Remember: Your goal is to create a CONCISE navigation structure with maximum 5 sections and 10 total documents. Prioritize the most essential operational information that multiple roles need access to. Avoid granular breakdowns and focus on high-level, actionable content.
+Remember: Your goal is to create a CONCISE navigation structure with maximum 5 sections and 10 total documents. The first section MUST ALWAYS be "Business Overview" with one document "Business Overview" going to "index.md". Prioritize the most essential operational information that multiple roles need access to. Avoid granular breakdowns and focus on high-level, actionable content.
+
+The Business Overview section should provide a high-level summary of the company, its structure, key personnel, main business functions, and overall operations based on the employee Q&A data.
 
 Analyze the provided Q&A data and return only the JSON structure with no additional explanation.
 """

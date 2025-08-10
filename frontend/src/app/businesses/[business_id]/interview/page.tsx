@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, MessageSquare } from "lucide-react";
+import { ArrowLeft, User, MessageSquare, Boxes } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface QuestionResponseDetail {
@@ -35,40 +35,78 @@ export default function InterviewsPage() {
   const [interviews, setInterviews] = useState<InterviewDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [buildingWiki, setBuildingWiki] = useState(false);
 
-  // Load data
-  useEffect(() => {
-    const loadData = async () => {
-      try {
+  // Load data function
+  const loadData = async (isInitialLoad = false) => {
+    try {
+      if (isInitialLoad) {
         setLoading(true);
-        const [businessResponse, interviewsResponse] = await Promise.all([
-          api.businesses.get(businessId),
-          api.interviews.getBusinessDetails(businessId),
-        ]);
+      }
+      const [businessResponse, interviewsResponse] = await Promise.all([
+        api.businesses.get(businessId),
+        api.interviews.getBusinessDetails(businessId),
+      ]);
 
-        if (!businessResponse.ok) {
-          throw new Error("Failed to load business");
-        }
-        if (!interviewsResponse.ok) {
-          throw new Error("Failed to load interviews");
-        }
+      if (!businessResponse.ok) {
+        throw new Error("Failed to load business");
+      }
+      if (!interviewsResponse.ok) {
+        throw new Error("Failed to load interviews");
+      }
 
-        const businessData = await businessResponse.json();
-        const interviewsData = await interviewsResponse.json();
+      const businessData = await businessResponse.json();
+      const interviewsData = await interviewsResponse.json();
 
-        setBusiness(businessData);
-        setInterviews(interviewsData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load data");
-      } finally {
+      setBusiness(businessData);
+      setInterviews(interviewsData);
+      setError(null); // Clear any previous errors
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load data");
+    } finally {
+      if (isInitialLoad) {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  // Initial load
+  useEffect(() => {
     if (businessId) {
-      loadData();
+      loadData(true);
     }
   }, [businessId]);
+
+  // Polling for updates every second
+  useEffect(() => {
+    if (!businessId || loading) return;
+
+    const interval = setInterval(() => {
+      loadData(false);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [businessId, loading]);
+
+  const handleBuildWiki = async () => {
+    try {
+      setBuildingWiki(true);
+      const response = await api.procedures.buildWiki({
+        business_id: businessId,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to build wiki");
+      }
+
+      // You might want to show a success message or redirect here
+      console.log("Wiki build started successfully");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to build wiki");
+    } finally {
+      setBuildingWiki(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -111,6 +149,14 @@ export default function InterviewsPage() {
             </h1>
           </div>
         </div>
+        <Button
+          onClick={handleBuildWiki}
+          disabled={buildingWiki || interviews.length === 0}
+          className="flex items-center space-x-2 font-bold"
+        >
+          <Boxes className="w-5 h-5" />
+          <span>{buildingWiki ? "Building Wiki..." : "Build Wiki"}</span>
+        </Button>
       </div>
 
       {/* Content */}
@@ -156,11 +202,27 @@ export default function InterviewsPage() {
                     {interview.questions_and_responses.map((qr, index) => (
                       <div
                         key={`${qr.question_id}-${qr.employee_id}`}
-                        className="border-l-4 border-blue-200 pl-4"
+                        className={`border-l-4 pl-4 ${
+                          qr.question_is_follow_up
+                            ? "border-orange-300"
+                            : "border-blue-200"
+                        }`}
                       >
                         <div className="flex items-start space-x-3 mb-3">
-                          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-semibold text-blue-600">
+                          <div
+                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                              qr.question_is_follow_up
+                                ? "bg-orange-100"
+                                : "bg-blue-100"
+                            }`}
+                          >
+                            <span
+                              className={`text-sm font-semibold ${
+                                qr.question_is_follow_up
+                                  ? "text-orange-600"
+                                  : "text-blue-600"
+                              }`}
+                            >
                               {index + 1}
                             </span>
                           </div>
@@ -169,9 +231,13 @@ export default function InterviewsPage() {
                               <h3 className="font-semibold text-gray-900">
                                 {qr.question_content}
                               </h3>
-                              {qr.question_is_follow_up && (
-                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              {qr.question_is_follow_up ? (
+                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
                                   Follow-up
+                                </span>
+                              ) : (
+                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                  Scripted
                                 </span>
                               )}
                             </div>

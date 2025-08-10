@@ -8,7 +8,7 @@ import {
   AIInputTools,
 } from "@/components/ui/shadcn-io/ai/input";
 import { MicIcon, PlusIcon } from "lucide-react";
-import { type FormEventHandler } from "react";
+import { type FormEventHandler, useCallback } from "react";
 
 interface PromptInputProps {
   value: string;
@@ -29,6 +29,19 @@ export default function PromptInput({
 }: PromptInputProps) {
   const status = isSubmitting ? "streaming" : "ready";
 
+  // Auto-focus using callback ref
+  const textareaCallbackRef = useCallback(
+    (element: HTMLTextAreaElement | null) => {
+      if (element && !disabled) {
+        // Small delay to ensure the element is fully mounted
+        setTimeout(() => {
+          element.focus();
+        }, 0);
+      }
+    },
+    [disabled]
+  );
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     if (!value.trim()) {
@@ -37,10 +50,27 @@ export default function PromptInput({
     onSubmit(event);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      if (value.trim() && !disabled) {
+        // Create a synthetic form event
+        const syntheticEvent = new Event("submit", {
+          bubbles: true,
+          cancelable: true,
+        }) as any;
+        syntheticEvent.preventDefault = () => {};
+        onSubmit(syntheticEvent);
+      }
+    }
+  };
+
   return (
     <AIInput onSubmit={handleSubmit}>
       <AIInputTextarea
+        ref={textareaCallbackRef}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         value={value}
         placeholder={placeholder}
         disabled={disabled}

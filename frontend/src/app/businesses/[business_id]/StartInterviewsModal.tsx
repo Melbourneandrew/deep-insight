@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Brain, User } from "lucide-react";
+import { api } from "@/lib/api";
 
 interface StartInterviewsModalProps {
   isOpen: boolean;
@@ -28,6 +29,15 @@ export function StartInterviewsModal({
   const handleSimulateInterview = async () => {
     setLoading(true);
     try {
+      // Call the simulate interview API
+      const response = await api.simulate.interview({
+        business_id: businessId,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to start simulated interview");
+      }
+
       // Navigate to the interviews page to show simulated interviews
       router.push(`/businesses/${businessId}/interview`);
       onClose();
