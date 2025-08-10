@@ -1,0 +1,37 @@
+{
+  "name": "Tech Startup Inc",
+  "seed_data": {
+    "employees": [
+      {
+        "email": "ceo@techstartup.com",
+        "bio": "Founder and CEO with 15 years of experience in tech entrepreneurship"
+      },
+      {
+        "email": "cto@techstartup.com",
+        "bio": "Chief Technology Officer specializing in scalable architecture and AI/ML"
+      },
+      {
+        "email": "lead.dev@techstartup.com",
+        "bio": "Lead Developer with expertise in React, Node.js, and cloud technologies"
+      }
+    ],
+    "questions": [
+      {
+        "content": "What excites you most about working in a startup environment?",
+        "is_follow_up": false
+      },
+      {
+        "content": "How do you handle the fast-paced nature of our industry?",
+        "is_follow_up": false
+      },
+      {
+        "content": "What innovative ideas do you have for our product roadmap?",
+        "is_follow_up": false
+      },
+      {
+        "content": "Can you tell me more about that idea?",
+        "is_follow_up": true
+      }
+    ]
+  }
+}

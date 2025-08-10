@@ -2,8 +2,15 @@ from enum import StrEnum
 from uuid import UUID, uuid4
 from typing import List, Optional
 
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from sqlmodel import Field, Relationship, SQLModel, Column, String, ForeignKey
+from sqlmodel import (
+    Column,
+    String,
+    ForeignKey,
+    Field,
+    Relationship,
+    SQLModel,
+    UUID as PGUUID,
+)
 
 
 class TableName(StrEnum):
@@ -30,7 +37,7 @@ class EmployeeBase(SQLModel, table=False):
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
     )
-    email: str = Field(sa_column=Column(String(320), nullable=False, unique=True))
+    email: str = Field(sa_column=Column(String(320), nullable=False))
     bio: Optional[str] = None
     business_id: UUID = Field(
         sa_column=Column(
@@ -54,6 +61,7 @@ class QuestionBase(SQLModel, table=False):
             nullable=False,
         ),
     )
+    order_index: Optional[int] = Field(default=None)
     is_follow_up: bool = Field(default=False)
 
 
