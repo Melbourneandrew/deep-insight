@@ -46,6 +46,7 @@ class EmployeeSeedData(BaseModel):
 class QuestionSeedData(BaseModel):
     content: str
     is_follow_up: bool = False
+    order_index: Optional[int] = None
 
 
 class BusinessSeedData(BaseModel):
@@ -100,7 +101,6 @@ class SimulateInterviewResponse(BaseModel):
     questions_asked: List[Dict[str, Any]]
 
 
-
 # Background task response schemas
 class SimulateInterviewBackgroundResponse(BaseModel):
     message: str
@@ -114,6 +114,7 @@ class SimulateEmployeeInterviewBackgroundResponse(BaseModel):
     interview_id: Optional[UUID] = None
     status: str = "started"
 
+
 # Build Wiki schemas
 class BuildWikiRequest(BaseModel):
     business_id: UUID
@@ -124,4 +125,3 @@ class BuildWikiResponse(BaseModel):
     business_id: UUID
     sections_plan: Dict[str, Any]
     files_created: List[str]  # List of file paths as strings
-

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 @router.get("/", response_model=List[Business])
 def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
     return list(
-        session.exec(select(Business).order_by(Business.created_at.asc())).all() # type: ignore
+        session.exec(select(Business).order_by(Business.created_at.asc())).all()  # type: ignore
     )
 
 
@@ -62,6 +62,7 @@ def _seed_business_data(
         question = Question(
             content=question_data.content,
             is_follow_up=question_data.is_follow_up,
+            order_index=question_data.order_index,
             business_id=business.id,
         )
         session.add(question)
