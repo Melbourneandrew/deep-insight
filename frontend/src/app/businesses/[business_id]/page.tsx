@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { AddEmployeeModal } from "@/components/AddEmployeeModal";
 import { AddQuestionModal } from "@/components/AddQuestionModal";
+import { Trash2, Plus } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Business {
@@ -188,6 +189,9 @@ export default function BusinessDetailsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Business Name Header */}
       <div className="mb-8">
+        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+          BUSINESS
+        </div>
         <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
       </div>
 
@@ -198,6 +202,7 @@ export default function BusinessDetailsPage() {
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">Employees</h2>
             <Button onClick={() => setShowAddEmployee(true)}>
+              <Plus className="w-4 h-4 mr-2" />
               Add Employee
             </Button>
           </div>
@@ -208,9 +213,6 @@ export default function BusinessDetailsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Bio
-                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -220,7 +222,7 @@ export default function BusinessDetailsPage() {
                 {employees.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={3}
+                      colSpan={2}
                       className="px-6 py-4 text-center text-gray-500"
                     >
                       No employees found
@@ -232,12 +234,9 @@ export default function BusinessDetailsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {employee.email}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {employee.bio || "-"}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
                           onClick={() =>
                             setConfirmDelete({
@@ -246,8 +245,9 @@ export default function BusinessDetailsPage() {
                               name: employee.email,
                             })
                           }
+                          className="text-gray-500 hover:text-gray-700"
                         >
-                          Delete
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </td>
                     </tr>
@@ -263,6 +263,7 @@ export default function BusinessDetailsPage() {
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">Questions</h2>
             <Button onClick={() => setShowAddQuestion(true)}>
+              <Plus className="w-4 h-4 mr-2" />
               Create Question
             </Button>
           </div>
@@ -310,7 +311,7 @@ export default function BusinessDetailsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
                           onClick={() =>
                             setConfirmDelete({
@@ -319,8 +320,9 @@ export default function BusinessDetailsPage() {
                               name: question.content,
                             })
                           }
+                          className="text-gray-500 hover:text-gray-700"
                         >
-                          Delete
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </td>
                     </tr>

@@ -1,6 +1,9 @@
+"use client";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <div className="text-center max-w-4xl mx-auto px-6">
@@ -14,7 +17,11 @@ export default function Home() {
           Transform your business knowledge into actionable insights with our
           intelligent wiki platform
         </p>
-        <Button size="lg" className="text-lg px-8 py-6">
+        <Button
+          size="lg"
+          className="text-lg px-8 py-6"
+          onClick={() => router.push("/businesses")}
+        >
           Get Started
         </Button>
       </div>

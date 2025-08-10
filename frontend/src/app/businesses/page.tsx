@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, ArrowRight } from "lucide-react";
 import CreateBusinessModal from "./CreateBusinessModal";
@@ -12,6 +13,7 @@ interface Business {
 }
 
 export default function BusinessesPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -119,13 +121,19 @@ export default function BusinessesPage() {
 
         {/* Business Grid */}
         {!isLoading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-wrap gap-4">
             {/* Add Business Modal */}
-            <CreateBusinessModal onBusinessCreated={fetchBusinesses} />
+            <div className="w-80">
+              <CreateBusinessModal onBusinessCreated={fetchBusinesses} />
+            </div>
 
             {/* Business Cards */}
             {filteredBusinesses.map((business) => (
-              <div key={business.id} className="group cursor-pointer">
+              <div
+                key={business.id}
+                className="w-80 group cursor-pointer"
+                onClick={() => router.push(`/businesses/${business.id}`)}
+              >
                 <div className="bg-card border border-border rounded-lg p-4 h-36 flex flex-col transition-all duration-200 hover:border-ring hover:shadow-lg hover:shadow-black/5">
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">

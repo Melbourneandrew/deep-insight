@@ -1,78 +1,43 @@
 {
   "employees": [
     {
-      "email": "john.doe@company.com",
-      "bio": "Senior Software Engineer with 8 years of experience in full-stack development. Passionate about clean code and agile methodologies."
+      "email": "jim.halpert@apexdynamics.io",
+      "bio": "Sales Representative with a knack for pranks and an impressive ability to close deals while maintaining a laid-back attitude. Co-Regional Manager with innovative sales strategies."
     },
     {
-      "email": "sarah.smith@company.com",
-      "bio": "Product Manager with expertise in user experience design and market research. Led multiple successful product launches."
+      "email": "pam.beesly@nexusventures.co",
+      "bio": "Office Administrator and aspiring artist. Expert in reception duties, office management, and maintaining sanity in a chaotic workplace. Recently promoted to Office Administrator."
     },
     {
-      "email": "mike.johnson@company.com",
-      "bio": "DevOps Engineer specializing in cloud infrastructure and automation. Strong background in AWS and containerization."
+      "email": "dwight.schrute@quantumsystems.net",
+      "bio": "Assistant Regional Manager and beet farmer. Dedicated salesperson with unmatched loyalty to the company and an encyclopedic knowledge of survival tactics and martial arts."
     },
     {
-      "email": "lisa.williams@company.com",
-      "bio": "Marketing Director with 10+ years experience in digital marketing and brand strategy. Expert in social media and content marketing."
+      "email": "michael.scott@phoenixenterprises.com",
+      "bio": "Regional Manager with 15+ years experience. World's Best Boss according to his mug. Specializes in relationship building, comedy, and making the workplace feel like family."
     },
     {
-      "email": "david.brown@company.com",
-      "bio": "Sales Representative focused on B2B enterprise solutions. Consistently exceeds quarterly targets and builds strong client relationships."
+      "email": "stanley.hudson@velocityholdings.biz",
+      "bio": "Sales Representative with a passion for crossword puzzles and Florida retirement planning. Brings steady, reliable performance and an appreciation for pretzel day."
     }
   ],
   "questions": [
     {
-      "content": "What motivates you most in your current role?",
+      "content": "What is your role?",
+      "is_follow_up": false,
+      "order_index": 0
+    },
+    {
+      "content": "Tell me about the projects you work on",
       "is_follow_up": false
     },
     {
-      "content": "How do you handle challenging situations or conflicts at work?",
+      "content": "Who do you meet with and what do you talk about?",
       "is_follow_up": false
     },
     {
-      "content": "What skills would you like to develop further in your career?",
+      "content": "What are the primary resources that you use to do your job effectively?",
       "is_follow_up": false
-    },
-    {
-      "content": "How do you stay current with industry trends and best practices?",
-      "is_follow_up": false
-    },
-    {
-      "content": "What do you think are the biggest opportunities for our company?",
-      "is_follow_up": false
-    },
-    {
-      "content": "How would you describe the company culture to a potential new hire?",
-      "is_follow_up": false
-    },
-    {
-      "content": "What tools or processes could be improved to help you work more effectively?",
-      "is_follow_up": false
-    },
-    {
-      "content": "How do you prioritize your tasks when you have multiple deadlines?",
-      "is_follow_up": false
-    },
-    {
-      "content": "What feedback would you give to leadership about team dynamics?",
-      "is_follow_up": false
-    },
-    {
-      "content": "What achievements are you most proud of in your current position?",
-      "is_follow_up": false
-    },
-    {
-      "content": "Can you elaborate on that experience?",
-      "is_follow_up": true
-    },
-    {
-      "content": "What specific challenges did you face in that situation?",
-      "is_follow_up": true
-    },
-    {
-      "content": "How did that impact your team or the project outcome?",
-      "is_follow_up": true
     }
   ]
 }
