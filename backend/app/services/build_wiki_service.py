@@ -1,14 +1,19 @@
+import asyncio
 import logging
 import os
 import shutil
+import sys
 from pathlib import Path
+from uuid import UUID
 
+import yaml
 from app.agents.chain import run_chain
 from app.db import get_session
-from app.models.models import Business
+from app.models.models import (Business, Employee, Interview, Question,
+                               QuestionResponse)
 from app.services.schemas.schema import BuildWikiRequest, BuildWikiResponse
 from fastapi import Depends
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
 
@@ -37,17 +42,13 @@ class BuildWikiService:
         if not business:
             raise ValueError("Business not found")
 
-        # For now, use mock data - comment out interview data generation
-        # yaml_text = self._generate_yaml_from_interviews(request.business_id)
-        # if not yaml_text.strip():
-        #     raise ValueError("No interview data found for this business")
-        
-        # Use mock data for this iteration
-        backend_dir = Path(__file__).resolve().parents[2]
-        mock_data_path = backend_dir / "tests" / "mock_data.yaml"
-        yaml_text = mock_data_path.read_text(encoding="utf-8")
+        # Generate YAML from interview data in the database
+        yaml_text = self._generate_yaml_from_interviews(request.business_id)
+        if not yaml_text.strip():
+            raise ValueError("No interview data found for this business")
 
         # Get docs directory path
+        backend_dir = Path(__file__).resolve().parents[2]
         repo_root = backend_dir.parent
         docs_root_dir = repo_root / "docs"
         docs_output_dir = docs_root_dir / "docs"
@@ -91,77 +92,70 @@ class BuildWikiService:
             logger.info(f"Docs directory {docs_output_dir} does not exist, creating it")
             docs_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # def _generate_yaml_from_interviews(self, business_id: UUID) -> str:
-    #     """
-    #     Generate YAML content from interview data for a business.
-    #     
-    #     Args:
-    #         business_id: UUID of the business
-    #         
-    #     Returns:
-    #         YAML string containing employee interview data
-    #     """
-    #     # Get all employees for the business
-    #     employees = list(self.session.exec(
-    #         select(Employee).where(Employee.business_id == business_id)
-    #     ))
-
-    #     if not employees:
-    #         return ""
-
-    #     # Build the data structure
-    #     yaml_data = {"employees": []}
-
-    #     for employee in employees:
-    #         # Get all interviews for this employee
-    #         interviews = list(self.session.exec(
-    #             select(Interview).where(
-    #                 Interview.employee_id == employee.id,
-    #                 Interview.business_id == business_id
-    #             )
-    #         ))
-
-    #         if not interviews:
-    #             continue
-
-    #         # Collect all Q&A for this employee across all interviews
-    #         qa_pairs = []
+    def _generate_yaml_from_interviews(self, business_id: UUID) -> str:
+        """
+        Generate YAML content from interview data for a business.
+        
+        Args:
+            business_id: UUID of the business
             
-    #         for interview in interviews:
-    #             # Get all responses for this interview
-    #             responses = list(self.session.exec(
-    #                 select(QuestionResponse)
-    #                 .where(QuestionResponse.interview_id == interview.id)
-    #                 .join(Question, QuestionResponse.question_id == Question.id)
-    #                 .order_by(Question.order_index)
-    #             ))
+        Returns:
+            YAML string containing employee interview data
+        """
+        # Get all employees for the business
+        employees = list(self.session.exec(
+            select(Employee).where(Employee.business_id == business_id)
+        ))
 
-    #             for response in responses:
-    #                 # Get the question content
-    #                 question = self.session.get(Question, response.question_id)
-    #                 if question:
-    #                     qa_pairs.append({
-    #                         "question": question.content,
-    #                         "answer": response.content
-    #                     })
+        if not employees:
+            return ""
 
-    #         if qa_pairs:
-    #             employee_data = {
-    #                 "name": employee.email.split("@")[0].replace(".", " ").title(),
-    #                 "qa": qa_pairs
-    #             }
-                
-    #             # Add bio if available
-    #             if employee.bio:
-    #                 employee_data["bio"] = employee.bio
+        # Build the data structure
+        yaml_data = {"employees": []}
+
+        for employee in employees:
+            # Get all interviews for this employee
+            interviews = list(self.session.exec(
+                select(Interview).where(
+                    Interview.employee_id == employee.id,
+                    Interview.business_id == business_id
+                )
+            ))
+
+            if not interviews:
+                continue
+
+            # Collect all Q&A for this employee across all interviews
+            qa_pairs = []
+            
+            for interview in interviews:
+                # Get all responses for this interview
+                responses = list(self.session.exec(
+                    select(QuestionResponse)
+                    .where(QuestionResponse.interview_id == interview.id)
+                    .join(Question, QuestionResponse.question_id == Question.id)
+                    .order_by(Question.order_index)
+                ))
+
+                for response in responses:
+                    # Get the question content
+                    question = self.session.get(Question, response.question_id)
+                    if question:
+                        qa_pairs.append({
+                            "question": question.content,
+                            "answer": response.content
+                        })
+
+            if qa_pairs:
+                employee_data = {
+                    "name": employee.email.split("@")[0].replace(".", " ").title(),
+                    "qa": qa_pairs
+                }
                     
-    #             yaml_data["employees"].append(employee_data)
+                yaml_data["employees"].append(employee_data)
 
-    #     # Convert to YAML string
-    #     return yaml.dump(yaml_data, default_flow_style=False, allow_unicode=True)
-
-
-
+        # Convert to YAML string
+        return yaml.dump(yaml_data, default_flow_style=False, allow_unicode=True)
 
 
 def get_build_wiki_service(
