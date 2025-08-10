@@ -46,11 +46,7 @@ export default function BusinessesPage() {
       console.log("Parsing JSON...");
       const data = await response.json();
       console.log("Data received:", data);
-      // Sort businesses in reverse chronological order (by ID as proxy for creation time)
-      const sortedData = data.sort((a: Business, b: Business) =>
-        b.id.localeCompare(a.id)
-      );
-      setBusinesses(sortedData);
+      setBusinesses(data);
       console.log("Businesses set successfully");
     } catch (err) {
       console.error("Detailed error in fetchBusinesses:", err);
@@ -122,49 +118,50 @@ export default function BusinessesPage() {
             </div>
           </div>
         )}
+        <div className="flex flex-col items-center justify-center">
+          {/* Business Grid */}
+          {!isLoading && !error && (
+            <div className="flex flex-wrap gap-4 w-fit grid grid-cols-3">
+              {/* Add Business Modal */}
+              <div className="w-80">
+                <CreateBusinessModal onBusinessCreated={fetchBusinesses} />
+              </div>
 
-        {/* Business Grid */}
-        {!isLoading && !error && (
-          <div className="flex flex-wrap gap-4">
-            {/* Add Business Modal */}
-            <div className="w-80">
-              <CreateBusinessModal onBusinessCreated={fetchBusinesses} />
-            </div>
+              {/* Business Cards */}
+              {filteredBusinesses.map((business) => (
+                <div
+                  key={business.id}
+                  className="w-80 group cursor-pointer"
+                  onClick={() => router.push(`/businesses/${business.id}`)}
+                >
+                  <div className="bg-card border border-border rounded-lg p-4 h-36 flex flex-col transition-all duration-200 hover:border-ring hover:shadow-lg hover:shadow-black/5">
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-card-foreground group-hover:text-primary transition-colors">
+                          {business.name}
+                        </h3>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1" />
+                      </div>
 
-            {/* Business Cards */}
-            {filteredBusinesses.map((business) => (
-              <div
-                key={business.id}
-                className="w-80 group cursor-pointer"
-                onClick={() => router.push(`/businesses/${business.id}`)}
-              >
-                <div className="bg-card border border-border rounded-lg p-4 h-36 flex flex-col transition-all duration-200 hover:border-ring hover:shadow-lg hover:shadow-black/5">
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-card-foreground group-hover:text-primary transition-colors">
-                        {business.name}
-                      </h3>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1" />
-                    </div>
+                      <p className="text-muted-foreground text-xs mb-3 leading-relaxed">
+                        Business profile ready for insights
+                      </p>
 
-                    <p className="text-muted-foreground text-xs mb-3 leading-relaxed">
-                      Business profile ready for insights
-                    </p>
-
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        Click to explore
-                      </span>
-                      <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs font-medium">
-                        Business
-                      </span>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          Click to explore
+                        </span>
+                        <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs font-medium">
+                          Business
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Empty State */}
         {!isLoading && !error && filteredBusinesses.length === 0 && (
