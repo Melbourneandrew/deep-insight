@@ -11,12 +11,6 @@ Create a complete, professional markdown document that synthesizes the relevant 
 
 ## Writing Guidelines
 
-### Content Structure
-- Use clear headings and subheadings (##, ###, ####)
-- Include an overview/introduction paragraph
-- Organize information logically with sections and subsections
-- End with relevant references or related information
-
 ### Writing Style
 - Write in clear, professional language
 - Use active voice and present tense
@@ -24,12 +18,11 @@ Create a complete, professional markdown document that synthesizes the relevant 
 - Include concrete examples, processes, and procedures from the Q&A data
 - Use bullet points and numbered lists for clarity
 
-### Content Requirements
-- **Extract relevant information** from the Q&A responses across all employees
-- **Synthesize related concepts** - don't just copy individual answers
-- **Identify patterns and processes** mentioned by multiple people
-- **Include specific details** like tools, thresholds, timelines, and procedures
-- **Cross-reference related workflows** between different roles/teams
+### Content Structure
+- Use clear headings and subheadings (##, ###, ####)
+- Include an overview/introduction paragraph
+- Organize information logically with sections and subsections
+- End with relevant references or related information
 
 ### Markdown Formatting
 - Use proper markdown syntax
@@ -37,24 +30,52 @@ Create a complete, professional markdown document that synthesizes the relevant 
 - Use code blocks for system names, file paths, or technical terms
 - Use emphasis (*italic*) and strong (**bold**) appropriately
 - Include horizontal rules (---) to separate major sections
-
-### What to Include
-Based on the Q&A data, your document should cover:
-- **Key processes and workflows** - step-by-step procedures
-- **Roles and responsibilities** - who does what
-- **Tools and systems** - what platforms and software are used
-- **Policies and thresholds** - approval limits, escalation criteria
-- **Best practices** - recommended approaches and guidelines
-- **Common issues** - frequently encountered problems and solutions
-- **Escalation procedures** - when and how to escalate
-- **Meeting cadences** - recurring meetings and their purposes
-- **Metrics and KPIs** - how success is measured
+- **Important for MkDocs compatibility**: Use 4 spaces for nested bullet point indentation (not 2 spaces or tabs)
 
 ### What NOT to Include
 - Don't create fictional information not found in the Q&A data
 - Don't include personal opinions or speculation
 - Don't repeat the same information multiple times
 - Don't write generic boilerplate content
+
+## Content Guidelines
+
+### Team-Level Content Guidelines
+For all team-specific or operational documentation, your document should cover:
+
+#### Information Synthesis
+- **Extract relevant information** from the Q&A responses across all employees
+- **Synthesize related concepts** - don't just copy individual answers
+- **Identify patterns and processes** mentioned by multiple people
+- **Include specific details** like tools, thresholds, timelines, and procedures
+- **Cross-reference related workflows** between different roles/teams
+
+#### Required Content Areas
+- **Key processes and workflows** - step-by-step procedures
+- **Roles and responsibilities** - who does what
+- **Tools and systems** - what platforms and software are used
+- **Meeting cadences** - recurring meetings and their purposes
+- **Metrics and KPIs** - how success is measured
+
+### Business Overview Content Guidelines
+If you are writing a "Business Overview" document, follow this specific structure:
+
+#### <Company Name> Overview Section
+- **About Us** - Clear description of the business, its mission, and core purpose
+- **Market Impact** - Target customers and competitive advantages
+- **Strategic priorities (12 mo)** - Key strategic initiatives for the next 12 months
+- **Core KPIs** - Primary metrics that measure business success
+
+#### Customers & GTM Section
+- **ICP & primary use cases** - Ideal customer profile and main use cases for the product/service
+- **Segments & channels** - Customer segments and go-to-market channels
+- **Top customers/logos** - Key customers and notable client logos
+
+#### People & Org Section
+- **Org chart** - Organizational structure (use mermaid diagram if employee data supports it)
+- **Headcount by function** - Team sizes and distribution across departments
+
+This should be written as a high-level company overview that helps new employees and stakeholders understand the business structure, strategy, and operations.
 
 ## Output Format
 Return ONLY the markdown content for the document. Do not include any preamble, explanation, or meta-commentary. The response should be ready to write directly to a .md file.
@@ -76,7 +97,10 @@ Description of the main topic...
 
 ### Process B
 - Point one
+    - Sub-point with 4-space indentation
+    - Another sub-point
 - Point two
+    - Nested detail with proper spacing
 
 ## Section 3: Tools and Systems
 | Tool | Purpose | Owner |
@@ -88,8 +112,6 @@ Description of the main topic...
 - Up to $X: Manager approval
 - Above $X: Finance approval
 
-## Section 5: Escalation Procedures
-When to escalate and to whom...
 
 ---
 *Last updated: [Auto-generated documentation]*
