@@ -15,7 +15,7 @@ from litellm import acompletion
 logger = logging.getLogger(__name__)
 
 
-async def plan_documentation_sections(yaml_text: str, model: str = "gpt-4o-mini") -> dict:
+async def plan_documentation_sections(yaml_text: str, model: str = "openai/gpt-5-mini-2025-08-07") -> dict:
     """
     Plan documentation sections based on employee Q&A data.
     
@@ -83,7 +83,7 @@ def _extract_and_parse_json(content: str) -> dict:
         raise ValueError(f"Could not parse JSON from LLM response: {e}")
 
 
-async def write_documentation_content(yaml_text: str, title: str, section_name: str, model: str = "gpt-4o-mini", semaphore: asyncio.Semaphore = None) -> str:
+async def write_documentation_content(yaml_text: str, title: str, section_name: str, model: str = "openai/gpt-5-mini-2025-08-07", semaphore: asyncio.Semaphore = None) -> str:
     """
     Write documentation content for a specific document using LLM.
     
@@ -206,7 +206,7 @@ async def _create_single_doc(doc_info: dict, yaml_text: str, model: str, semapho
     return full_path
 
 
-async def create_documentation_files(sections_json: dict, docs_output_dir: Path, yaml_text: str, model: str = "gpt-4o-mini") -> list[Path]:
+async def create_documentation_files(sections_json: dict, docs_output_dir: Path, yaml_text: str, model: str = "openai/gpt-5-mini-2025-08-07") -> list[Path]:
     """
     Create markdown files for all documents in the navigation structure using async processing.
     
@@ -266,7 +266,7 @@ def update_mkdocs_navigation(sections_json: dict, docs_root_dir: Path) -> None:
     logger.info("Updated mkdocs.yml navigation")
 
 
-async def run_chain(yaml_text: str, docs_output_dir: Path, docs_root_dir: Path, model: str = "gpt-4o-mini") -> tuple[dict, list[Path]]:
+async def run_chain(yaml_text: str, docs_output_dir: Path, docs_root_dir: Path, model: str = "openai/gpt-5-mini-2025-08-07") -> tuple[dict, list[Path]]:
     """
     Run the complete documentation chain: plan sections, create files, and update navigation.
     
