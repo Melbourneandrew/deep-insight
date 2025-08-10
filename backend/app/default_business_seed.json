@@ -1,24 +1,64 @@
 {
   "employees": [
     {
-      "email": "jim.halpert@apexdynamics.io",
-      "bio": "Sales Representative with a knack for pranks and an impressive ability to close deals while maintaining a laid-back attitude. Co-Regional Manager with innovative sales strategies."
+      "email": "michael.scott@dundermifflin.com",
+      "bio": "Regional Manager leading the Scranton branch with 15+ years experience. Sets sales targets, coaches the sales team, and ensures quarterly revenue goals while maintaining high morale. Owns territory design, hiring decisions in partnership with HR, and executive relationships with top 10 regional accounts. Runs Monday sales huddles, Wednesday branch updates, and Friday forecast reviews with Finance. Currently driving key account growth initiatives, referral programs for local small businesses, and CRM hygiene projects. Can approve discounts up to 20% with competing quotes attached."
     },
     {
-      "email": "pam.beesly@nexusventures.co",
-      "bio": "Office Administrator and aspiring artist. Expert in reception duties, office management, and maintaining sanity in a chaotic workplace. Recently promoted to Office Administrator."
+      "email": "jim.halpert@dundermifflin.com",
+      "bio": "Account Executive managing a book of mid-market clients, handling renewals and upsells, and prospecting new regional accounts. Drives opportunities from discovery to close using standard MEDDICC qualification playbooks. Currently focused on cross-sell campaigns for sustainable paper products and referral workflow pilots with Marketing. Maintains proposal SLAs of 24 hours for in-cycle deals. Targets 2 net-new meetings booked weekly, follows strict stage exit criteria, and can approve discounts up to 10% with justification. ICP includes mid-market office managers and procurement leads."
     },
     {
-      "email": "dwight.schrute@quantumsystems.net",
-      "bio": "Assistant Regional Manager and beet farmer. Dedicated salesperson with unmatched loyalty to the company and an encyclopedic knowledge of survival tactics and martial arts."
+      "email": "pam.beesly@dundermifflin.com",
+      "bio": "Office Administrator managing front office operations, coordinating calendars, and supporting onboarding with IT and HR to reduce day-one issues. Maintains branch facilities, supplies with specific par levels (paper at 30%, badges at 50 blanks), vendor relationships, and lobby/meeting room standards. Currently organizing client open houses and standardizing visitor check-in processes. Manages 4-step onboarding checklist including badge setup, equipment pickup, orientation tours, and admin request walkthroughs. Handles purchase requests with urgency tagging and maintains weekly coffee/tea reorder schedules."
     },
     {
-      "email": "michael.scott@phoenixenterprises.com",
-      "bio": "Regional Manager with 15+ years experience. World's Best Boss according to his mug. Specializes in relationship building, comedy, and making the workplace feel like family."
+      "email": "dwight.schrute@dundermifflin.com",
+      "bio": "Assistant to the Regional Manager supporting operations, enforcing sales process discipline, and managing key territory accounts. Ensures operational readiness including quarterly safety drills with headcount verification, forklift certification checks, and 24-hour incident reporting protocols. Currently refreshing territory coverage models, updating competitive battlecards, and maintaining safety documentation. Conducts daily pipeline audits, monitors KPIs like activities-to-meeting ratios and pipeline hygiene, and reviews territory segmentation quarterly by zip code clusters balanced on revenue and account density."
     },
     {
-      "email": "stanley.hudson@velocityholdings.biz",
-      "bio": "Sales Representative with a passion for crossword puzzles and Florida retirement planning. Brings steady, reliable performance and an appreciation for pretzel day."
+      "email": "stanley.hudson@dundermifflin.com",
+      "bio": "Sales Representative managing existing accounts with focus on efficient renewals and margin protection on repeat orders. Implements 90/60/30/14-day renewal touchpoints with value recaps, confirming procurement timelines and paper specifications. Currently executing retention campaigns for legacy accounts and streamlining reorder schedules to reduce client friction with auto-purchase options. Monitors churn risks including declining order frequency, late payments, and buyer changes, flagging these early in CRM for manager intervention."
+    },
+    {
+      "email": "phyllis.vance@dundermifflin.com",
+      "bio": "Sales Representative maintaining key customer relationships through in-person visits and handwritten follow-up notes. Coordinates samples with detailed SKU logging, delivery tracking, and 72-hour feedback follow-ups including usage guides when requested. Currently managing seasonal catalog outreach campaigns and planning client appreciation events. Ensures timely proposals tailored to specific client needs, maintains weekly route schedules for customer check-ins, and participates in quarterly customer advisory calls to strengthen relationships."
+    },
+    {
+      "email": "angela.martin@dundermifflin.com",
+      "bio": "Senior Accountant responsible for month-end close following strict 8-day calendar (Days 0-5: subledger close and reconciliations, Days 6-7: review and adjustments, Day 8: leadership sign-off). Manages accounts reconciliation, expense policy enforcement, and audit readiness with materiality thresholds of $2,500 for reclasses and $10,000 for accruals. Currently automating close checklists, updating T&E policies, and cleaning vendor master data. Operates three-way match controls for payables, segregation of duties for journal entries, and monthly bank reconciliation reviews with required sign-offs."
+    },
+    {
+      "email": "oscar.martinez@dundermifflin.com",
+      "bio": "Accountant providing financial analysis, budgeting support, and detailed variance explanations for leadership with investigation thresholds over 5% or $5,000. Currently improving rolling forecast models using seasonality from historical trends, promotion calendars from Marketing, and retention rates by segment. Creates simplified P&L views for non-finance managers and maintains shared assumptions tabs for transparency. Daily workflow includes morning data pulls, midday meetings, afternoon analysis work, and end-of-day summary notes to Finance leadership."
+    },
+    {
+      "email": "kelly.kapoor@dundermifflin.com",
+      "bio": "Customer Service Representative handling customer inquiries with 1-hour first response SLA and same-day resolution targets for simple issues (2 days for complex). Manages order status updates, coordinates with Sales for smooth handoffs, and documents resolutions with category tagging for trending analysis. Currently refreshing FAQ content for help center, implementing response time reduction initiatives, and developing post-order NPS follow-up flows. Escalates late shipments to Warehouse and pricing issues to Sales Ops. Common root causes addressed include address entry errors, inventory mismatches, and unclear delivery windows."
+    },
+    {
+      "email": "toby.flenderson@dundermifflin.com",
+      "bio": "HR Representative managing employee relations through impartial investigations with confidential documentation in HRIS case module. Provides policy guidance, coordinates compliance training, and currently updating onboarding materials while rolling out harassment prevention training. Manages semi-annual performance review cycle with calibrated ratings, requiring manager draft submissions two weeks prior and conducting calibration sessions before delivery. Handles employee relations investigations following structured process: intake, interviews, evidence review, findings write-up, and action plans."
+    },
+    {
+      "email": "creed.bratton@dundermifflin.com",
+      "bio": "Quality Assurance specialist conducting spot checks using AQL 1.0 sampling plans for standard lots with critical/major/minor defect classifications at 0/2.5/4.0 thresholds. Documents defects with photo logs and measurements, reports trends to operations, and triggers CAPA items when defect rates exceed thresholds. Currently managing incoming shipment sampling protocols and updating packaging checklists. Daily workflow includes floor walks, sampling, issue documentation, and filing reports with attached photos for any major or critical defects."
+    },
+    {
+      "email": "darryl.philbin@dundermifflin.com",
+      "bio": "Warehouse Foreman overseeing warehouse operations with daily shift kickoffs, safety briefs, lane assignments, and mid-shift audits. Manages safety compliance, on-time loading, and staffing across all shifts. Currently optimizing slotting for fast movers using ABC velocity ranking and pick path optimization, refreshing forklift maintenance schedules, and conducting receiving dock throughput studies. Tracks KPIs including on-time shipments by lane, picks per labor hour, dock-to-stock time, and incident-free days. Reviews slotting monthly and after catalog changes."
+    },
+    {
+      "email": "erin.hannon@dundermifflin.com",
+      "bio": "Receptionist providing front desk coverage with daily workflows including opening procedures, voicemail checks, visitor greeting, call routing, and delivery logging. Manages visitor management and provides light administrative support. Currently improving visitor signage and updating phone routing guide with decision tree: orders/status to Customer Service queue, new business to Sales queue, vendor/facilities to Operations, and HR matters to HR shared line. Maintains visitor logs and coordinates with office operations team for facility improvements."
+    },
+    {
+      "email": "jan.levinson@dundermifflin.com",
+      "bio": "VP of Corporate Strategy overseeing North American office paper and supplies market serving 50-1,000 employee companies including professional services, education, healthcare clinics, and light manufacturing. Manages corporate priorities including 8% revenue mix shift to higher-margin specialty and sustainable SKUs, ≥102% net revenue retention via cross-sell/upsell playbooks, ≥97% OTIF delivery excellence, and mid-market expansion in education/healthcare. Tracks business-level KPIs: revenue growth (YoY/QoQ), gross margin %, net revenue retention, churn rate, new logos, pipeline coverage (≥3x), OTIF, and customer NPS. Core customers are office managers, procurement leads, and operations teams with recurring usage and multi-site needs."
+    },
+    {
+      "email": "david.wallace@dundermifflin.com",
+      "bio": "CEO of Dunder Mifflin Paper Company and former CFO (2005-2009). Successfully acquired Dunder Mifflin from Sabre International in 2012 after co-founding and selling Suck It technology company to the U.S. Military for $20 million. Oversees all corporate operations, strategic acquisitions, and branch performance across regional markets. Known for maintaining professional relationships with regional managers while implementing corporate restructuring initiatives. Manages executive decision-making, board relations, and company-wide policy implementation. Balances corporate efficiency with branch autonomy, often serving as the bridge between corporate strategy and regional execution."
     }
   ],
   "questions": [
