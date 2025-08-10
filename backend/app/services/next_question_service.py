@@ -1,8 +1,15 @@
+import logging
+import os
+from typing import List, Optional
+from uuid import UUID, uuid4
 from sqlmodel import Session, select
 from fastapi import Depends
 from app.services.schemas.schema import NextQuestionRequest, NextQuestionResponse
 from app.models.models import Interview, Question, QuestionResponse
 from app.db import get_session
+import litellm
+
+logger = logging.getLogger(__name__)
 
 
 class NextQuestionService:
@@ -22,7 +29,7 @@ class NextQuestionService:
             NextQuestionResponse containing question and is_interview_over flag
 
         Raises:
-            ValueError: If interview does not exist
+            ValueError: If interview not found
         """
         # Validate interview exists
         interview = self.session.get(Interview, request.interview_id)

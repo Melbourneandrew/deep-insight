@@ -8,7 +8,7 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "gen:init": "cd backend && python -m scripts.save_api_schema",
-    "gen:backend": "npx @openapitools/openapi-generator-cli generate -i openapi.json -g python -o ./deep-insight-client --package-name=deep_insight_client && sed -i '' 's/license = \"NoLicense\"/license = {text = \"NoLicense\"}/g' ./deep-insight-client/pyproject.toml && cd backend && poetry add ../deep-insight-client",
+    "gen:backend": "npx @openapitools/openapi-generator-cli generate -i openapi.json -g python -o ./deep-insight-client --package-name=deep_insight_client && sed -i '' 's/license = \"NoLicense\"/license = {text = \"NoLicense\"}/g' ./deep-insight-client/pyproject.toml && cd backend && poetry remove deep-insight-client && poetry add ../deep-insight-client",
     "gen:frontend": "npx @openapitools/openapi-generator-cli generate -i openapi.json -g typescript-fetch -o ./frontend/src/api --additional-properties=npmName=deep-insight-api-client,npmVersion=1.0.0,withoutRuntimeChecks=true",
     "gen": "npm run gen:init && concurrently \"npm run gen:backend\" \"npm run gen:frontend\"",
     "test": "cd backend && python -m pytest",

@@ -3,6 +3,7 @@ from fastapi import Depends
 from app.services.schemas.schema import AnswerQuestionRequest, AnswerQuestionResponse
 from app.models.models import Interview, Question, QuestionResponse
 from app.db import get_session
+from uuid import uuid4
 
 
 class AnswerQuestionService:
