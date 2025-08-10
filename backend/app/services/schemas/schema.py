@@ -62,6 +62,29 @@ class SimulateInterviewRequest(BaseModel):
     business_id: UUID
 
 
+class SimulateEmployeeInterviewRequest(BaseModel):
+    employee_id: UUID
+    interview_id: Optional[UUID] = None  # If not provided, creates new interview
+
+
+class SimulatedQAExchange(BaseModel):
+    question_id: UUID
+    question_content: str
+    response_content: str
+    is_follow_up: bool
+    order_index: Optional[int] = None
+
+
+class SimulateEmployeeInterviewResponse(BaseModel):
+    interview_id: UUID
+    employee_id: UUID
+    employee_email: str
+    business_id: UUID
+    business_name: str
+    simulated_exchanges: List[SimulatedQAExchange]
+    is_interview_complete: bool
+
+
 class EmployeeSimulation(BaseModel):
     employee_id: UUID
     employee_email: str

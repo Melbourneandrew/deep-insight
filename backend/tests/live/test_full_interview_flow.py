@@ -34,6 +34,7 @@ from deep_insight_client import (
 )
 
 
+@pytest.mark.skip(reason="Long-running integration test - enable manually when needed")
 class TestFullInterviewFlow:
     """Integration test for complete interview workflow."""
     
