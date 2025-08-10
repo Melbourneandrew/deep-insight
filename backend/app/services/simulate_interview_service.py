@@ -323,10 +323,10 @@ Respond only with the answer content, no additional formatting or explanation.""
             # Extract content using robust attribute access
             try:
                 # Method 1: Try direct ModelResponse structure
-                if hasattr(response, 'choices') and response.choices:
-                    choice = response.choices[0]
-                    if hasattr(choice, 'message') and choice.message:
-                        message = choice.message
+                if hasattr(response, 'choices') and response.choices: # type: ignore    
+                    choice = response.choices[0] # type: ignore
+                    if hasattr(choice, 'message') and choice.message: # type: ignore
+                        message = choice.message # type: ignore
                         # Try content first
                         if hasattr(message, 'content') and message.content and message.content.strip():
                             content = message.content.strip()
