@@ -30,7 +30,9 @@ class StartInterviewService:
             raise ValueError(f"Employee with ID {request.employee_id} not found")
 
         # Create new interview record
-        interview = Interview(business_id=employee.business_id, employee_id=employee.id)
+        interview = Interview(
+            business_id=employee.business_id, employee_id=request.employee_id
+        )
 
         self.session.add(interview)
         self.session.commit()

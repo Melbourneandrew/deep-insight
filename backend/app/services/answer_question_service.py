@@ -1,7 +1,7 @@
-from sqlmodel import Session, select
+from sqlmodel import Session
 from fastapi import Depends
 from app.services.schemas.schema import AnswerQuestionRequest, AnswerQuestionResponse
-from app.models.models import Interview, Question, QuestionResponse, Employee
+from app.models.models import Interview, Question, QuestionResponse
 from app.db import get_session
 from uuid import uuid4
 
@@ -39,20 +39,10 @@ class AnswerQuestionService:
         if question.business_id != interview.business_id:
             raise ValueError("Question and interview must belong to the same business")
 
-        # Get the first employee from the business for this response
-        # Note: In a real scenario, we might need employee_id in the request
-        # For now, we'll use the first employee from the business
-        employee_stmt = select(Employee).where(
-            Employee.business_id == interview.business_id
-        )
-        employee = self.session.exec(employee_stmt).first()
-        if not employee:
-            raise ValueError(f"No employees found for business {interview.business_id}")
-
-        # Create the question response record
+        # Create the question response record using the employee from the interview
         response = QuestionResponse(
             interview_id=request.interview_id,
-            employee_id=employee.id,
+            employee_id=interview.employee_id,
             question_id=request.question_id,
             content=request.content,
         )

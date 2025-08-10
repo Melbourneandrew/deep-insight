@@ -8,10 +8,11 @@ from app.services.answer_question_service import get_answer_question_service
 router = APIRouter(prefix="/answer-question", tags=["procedures"])
 
 
-@router.post("/", response_model=AnswerQuestionResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=AnswerQuestionResponse, status_code=status.HTTP_201_CREATED
+)
 def answer_question(
-    request: AnswerQuestionRequest,
-    service = Depends(get_answer_question_service)
+    request: AnswerQuestionRequest, service=Depends(get_answer_question_service)
 ) -> AnswerQuestionResponse:
     """Record an employee's answer to a question during an interview."""
     try:

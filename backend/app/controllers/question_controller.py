@@ -4,7 +4,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 
 from app.db import get_session
 from app.models.models import Question
@@ -28,6 +28,17 @@ def list_questions(
 def create_question(
     question: Question, session: Session = Depends(get_session)
 ) -> Question:
+    # If no order_index is provided, auto-set it based on existing questions
+    if question.order_index is None:
+        # Find the highest order_index of non-follow-up questions for this business
+        max_order_query = select(func.max(Question.order_index)).where(
+            Question.business_id == question.business_id, Question.is_follow_up == False
+        )
+        max_order_result = session.exec(max_order_query).first()
+
+        # Set order_index to max + 3, or 3 if no existing questions
+        question.order_index = (max_order_result or 0) + 3
+
     session.add(question)
     session.commit()
     session.refresh(question)
