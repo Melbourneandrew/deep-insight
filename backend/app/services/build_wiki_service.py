@@ -1,82 +1,173 @@
-import asyncio
 import logging
+import os
 import shutil
 from pathlib import Path
+from typing import Any, Dict, List
+from uuid import UUID
 
 from app.agents.chain import run_chain
+from app.db import get_session
+from app.models.models import Business
+from app.services.schemas.schema import BuildWikiRequest, BuildWikiResponse
+from fastapi import Depends
+from sqlmodel import Session
 
 logger = logging.getLogger(__name__)
 
 
-def clear_docs_folder(docs_output_dir: Path) -> None:
-    """
-    Clear all contents of the docs output directory.
-    
-    Args:
-        docs_output_dir: Path to the docs directory to clear
-    """
-    if docs_output_dir.exists():
-        logger.info(f"Clearing contents of {docs_output_dir}")
-        # Remove all contents but keep the directory itself
-        for item in docs_output_dir.iterdir():
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
-        logger.info("Docs folder cleared successfully")
-    else:
-        logger.info(f"Docs directory {docs_output_dir} does not exist, creating it")
-        docs_output_dir.mkdir(parents=True, exist_ok=True)
+class BuildWikiService:
+    """Service for building wiki documentation from interview data"""
 
+    def __init__(self, session: Session):
+        self.session = session
 
-async def build_wiki_from_yaml_text(
-    yaml_text: str, docs_root_dir: Path, model: str = "openai/gpt-5-mini-2025-08-07"
-) -> tuple[dict, list[Path]]:
-    """
-    Build complete wiki from YAML text: plan navigation, create files, and update mkdocs.yml.
-    
-    Args:
-        yaml_text: The employee Q&A YAML data
-        docs_root_dir: Path to the docs directory containing mkdocs.yml
-        model: The LLM model to use
+    async def build_wiki(self, request: BuildWikiRequest) -> BuildWikiResponse:
+        """
+        Build wiki documentation from interview data for a business.
         
-    Returns:
-        Tuple of (sections_plan, created_files)
-    """
-    logger.info("Building wiki from YAML text")
+        Args:
+            request: BuildWikiRequest containing business_id
+            
+        Returns:
+            BuildWikiResponse containing success status and build results
+            
+        Raises:
+            ValueError: If business not found or no interview data exists
+        """
+        # Get the business
+        business = self.session.get(Business, request.business_id)
+        if not business:
+            raise ValueError("Business not found")
 
-    # Clear the docs output directory before building
-    docs_output_dir = docs_root_dir / "docs"
-    clear_docs_folder(docs_output_dir)
+        # For now, use mock data - comment out interview data generation
+        # yaml_text = self._generate_yaml_from_interviews(request.business_id)
+        # if not yaml_text.strip():
+        #     raise ValueError("No interview data found for this business")
+        
+        # Use mock data for this iteration
+        backend_dir = Path(__file__).resolve().parents[2]
+        mock_data_path = backend_dir / "tests" / "mock_data.yaml"
+        yaml_text = mock_data_path.read_text(encoding="utf-8")
 
-    # Run the complete chain: plan sections, create files, and update navigation
-    sections_plan, created_files = await run_chain(yaml_text, docs_output_dir, docs_root_dir, model=model)
+        # Get docs directory path
+        repo_root = backend_dir.parent
+        docs_root_dir = repo_root / "docs"
+        docs_output_dir = docs_root_dir / "docs"
 
-    logger.info("Wiki build completed")
-    return sections_plan, created_files
+        # Clear the docs output directory before building
+        self._clear_docs_folder(docs_output_dir)
+
+        # Get model from environment variable with default
+        model = os.getenv("WIKI_MODEL", "openai/gpt-5-mini-2025-08-07")
+
+        # Build wiki using the existing build_wiki_from_yaml_text function
+        sections_plan, created_files = await run_chain(yaml_text, docs_output_dir, docs_root_dir, model=model)
+
+        # Convert Path objects to strings for the response
+        file_paths = [str(file_path) for file_path in created_files]
+
+        return BuildWikiResponse(
+            success=True,
+            business_id=request.business_id,
+            sections_plan=sections_plan,
+            files_created=file_paths
+        )
+
+    def _clear_docs_folder(self, docs_output_dir: Path) -> None:
+        """
+        Clear all contents of the docs output directory.
+        
+        Args:
+            docs_output_dir: Path to the docs directory to clear
+        """
+        if docs_output_dir.exists():
+            logger.info(f"Clearing contents of {docs_output_dir}")
+            # Remove all contents but keep the directory itself
+            for item in docs_output_dir.iterdir():
+                if item.is_dir():
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
+            logger.info("Docs folder cleared successfully")
+        else:
+            logger.info(f"Docs directory {docs_output_dir} does not exist, creating it")
+            docs_output_dir.mkdir(parents=True, exist_ok=True)
+
+    # def _generate_yaml_from_interviews(self, business_id: UUID) -> str:
+    #     """
+    #     Generate YAML content from interview data for a business.
+    #     
+    #     Args:
+    #         business_id: UUID of the business
+    #         
+    #     Returns:
+    #         YAML string containing employee interview data
+    #     """
+    #     # Get all employees for the business
+    #     employees = list(self.session.exec(
+    #         select(Employee).where(Employee.business_id == business_id)
+    #     ))
+
+    #     if not employees:
+    #         return ""
+
+    #     # Build the data structure
+    #     yaml_data = {"employees": []}
+
+    #     for employee in employees:
+    #         # Get all interviews for this employee
+    #         interviews = list(self.session.exec(
+    #             select(Interview).where(
+    #                 Interview.employee_id == employee.id,
+    #                 Interview.business_id == business_id
+    #             )
+    #         ))
+
+    #         if not interviews:
+    #             continue
+
+    #         # Collect all Q&A for this employee across all interviews
+    #         qa_pairs = []
+            
+    #         for interview in interviews:
+    #             # Get all responses for this interview
+    #             responses = list(self.session.exec(
+    #                 select(QuestionResponse)
+    #                 .where(QuestionResponse.interview_id == interview.id)
+    #                 .join(Question, QuestionResponse.question_id == Question.id)
+    #                 .order_by(Question.order_index)
+    #             ))
+
+    #             for response in responses:
+    #                 # Get the question content
+    #                 question = self.session.get(Question, response.question_id)
+    #                 if question:
+    #                     qa_pairs.append({
+    #                         "question": question.content,
+    #                         "answer": response.content
+    #                     })
+
+    #         if qa_pairs:
+    #             employee_data = {
+    #                 "name": employee.email.split("@")[0].replace(".", " ").title(),
+    #                 "qa": qa_pairs
+    #             }
+                
+    #             # Add bio if available
+    #             if employee.bio:
+    #                 employee_data["bio"] = employee.bio
+                    
+    #             yaml_data["employees"].append(employee_data)
+
+    #     # Convert to YAML string
+    #     return yaml.dump(yaml_data, default_flow_style=False, allow_unicode=True)
 
 
-async def main() -> None:
-    """Main function to test wiki building with mock data."""
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-
-    backend_dir = Path(__file__).resolve().parents[2]
-    mock_data_path = backend_dir / "tests" / "mock_data.yaml"
-    repo_root = backend_dir.parent
-    docs_root_dir = repo_root / "docs"
-
-    logger.info("Starting wiki build", extra={"yaml": str(mock_data_path), "docs_root": str(docs_root_dir)})
-    
-    # Read YAML file and build wiki
-    yaml_text = mock_data_path.read_text(encoding="utf-8")
-    sections_plan, created_files = await build_wiki_from_yaml_text(yaml_text, docs_root_dir=docs_root_dir)
-    
-    logger.info("Wiki build completed", extra={
-        "sections_count": len(sections_plan.get("sections", [])),
-        "files_created": len(created_files)
-    })
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
 
+def get_build_wiki_service(
+    session: Session = Depends(get_session),
+) -> BuildWikiService:
+    """Get BuildWikiService with injected dependencies"""
+    return BuildWikiService(session)
