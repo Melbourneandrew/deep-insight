@@ -16,20 +16,6 @@ theme:
   - search.share
   - content.code.copy
 nav:
-- Business Overview: index.md
-- Sales & Customer Operations:
-    Sales Process Overview: sales/sales_process_overview.md
-    Account Management and Onboarding: sales/account_management_onboarding.md
-    Sales Enablement and Performance: sales/sales_enablement_performance.md
-- Operations & Facilities:
-    Office Operations and Vendor Management: operations/office_operations_vendor_management.md
-    Field Operations and Logistics: operations/field_operations_logistics.md
-- Tools & Systems:
-    Tools and Platforms Overview: tools/tools_and_platforms_overview.md
-    Integrations and Data Workflows: tools/integrations_data_workflows.md
-- Finance & Administration:
-    Finance and Client Financial Services: finance/finance_client_services.md
-    People and Culture: admin/people_and_culture.md
 markdown_extensions:
 - tables
 - pymdownx.highlight:
