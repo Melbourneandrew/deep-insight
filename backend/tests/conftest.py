@@ -14,6 +14,12 @@ from sqlmodel import Session, SQLModel, create_engine, text
 from py_pglite.config import PGliteConfig
 from py_pglite.sqlalchemy import SQLAlchemyPGliteManager
 
+# Configure logging to reduce verbosity during tests
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("LiteLLM Proxy").setLevel(logging.WARNING)  
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 from app.main import app
 from app.db import get_session
 from app.models.models import Business, Employee
@@ -66,7 +72,7 @@ def _clean_database_data(engine):
                 )
 
                 table_names = [row[0] for row in result]
-                logger.debug(f"Found tables to clean: {table_names}")
+                logger.info(f"Found tables to clean: {table_names}")
 
                 if table_names:
                     # Disable foreign key checks for faster cleanup
@@ -86,13 +92,13 @@ def _clean_database_data(engine):
 
                     # Commit the cleanup
                     conn.commit()
-                    logger.debug("Database cleanup completed successfully")
+                    logger.info("Database cleanup completed successfully")
                 else:
-                    logger.debug("No tables found to clean")
+                    logger.info("No tables found to clean")
                 break  # Success, exit retry loop
 
         except Exception as e:
-            logger.debug(f"Database cleanup attempt {attempt + 1} failed: {e}")
+            logger.info(f"Database cleanup attempt {attempt + 1} failed: {e}")
             if attempt == retry_count - 1:
                 logger.warning(
                     "Database cleanup failed after all retries, continuing anyway"
@@ -217,9 +223,9 @@ def test_server(pglite_engine):
 
     app.dependency_overrides[get_session] = get_test_session
 
-    # Create server instance with verbose logging
+    # Create server instance with minimal logging
     config = uvicorn.Config(
-        app=app, host="127.0.0.1", port=port, log_level="debug", access_log=True
+        app=app, host="127.0.0.1", port=port, log_level="warning", access_log=False
     )
     server = uvicorn.Server(config)
 
@@ -239,23 +245,23 @@ def test_server(pglite_engine):
             formatter = logging.Formatter('[SERVER] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(formatter)
-            handler.setLevel(logging.DEBUG)
+            handler.setLevel(logging.INFO)
             
             # Configure root logger to capture everything
-            root_logger.setLevel(logging.DEBUG)
+            root_logger.setLevel(logging.INFO)
             root_logger.addHandler(handler)
             
             # Configure specific loggers
             uvicorn_logger = logging.getLogger("uvicorn")
-            uvicorn_logger.setLevel(logging.DEBUG)
+            uvicorn_logger.setLevel(logging.INFO)
             
             # Configure app loggers (this will capture our LLM logs)
             app_logger = logging.getLogger("app")
-            app_logger.setLevel(logging.DEBUG)
+            app_logger.setLevel(logging.INFO)
             
             # Configure our specific service logger
             service_logger = logging.getLogger("app.services.next_question_service")
-            service_logger.setLevel(logging.DEBUG)
+            service_logger.setLevel(logging.INFO)
             
             print(f"[SERVER] Starting test server on port {port}...", flush=True)
             print(f"[SERVER] Logger configured - will show LLM integration logs", flush=True)

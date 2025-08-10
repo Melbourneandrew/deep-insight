@@ -234,41 +234,104 @@ Respond with ONLY the question text, no additional formatting or explanation."""
             response = litellm.completion(
                 model=model, messages=messages, max_tokens=300, temperature=0.7
             )
-
-            # Extract content safely - handle various response types
+            
+            # Extract content using robust attribute access
             try:
-                # Try basic attribute access first
-                if hasattr(response, "choices") and getattr(response, "choices", None):
-                    choices = getattr(response, "choices")
-                    if choices and len(choices) > 0:
-                        choice = choices[0]
-                        if hasattr(choice, "message"):
-                            message = getattr(choice, "message", None)
-                            if message and hasattr(message, "content"):
-                                content = getattr(message, "content", None)
-                                if content and isinstance(content, str):
-                                    return content.strip()
-
-                # Alternative parsing for different response formats
-                if hasattr(response, "__dict__"):
-                    response_dict = getattr(response, "__dict__", {})
-                    if "choices" in response_dict and response_dict["choices"]:
-                        choice = response_dict["choices"][0]
-                        if (
-                            isinstance(choice, dict)
-                            and "message" in choice
-                            and "content" in choice["message"]
-                        ):
-                            content = choice["message"]["content"]
-                            if content and isinstance(content, str):
-                                return content.strip()
-
-            except (AttributeError, KeyError, IndexError, TypeError, Exception):
-                pass
-
-            # Fallback if response parsing fails
-            return "Can you tell me more about that?"
-
+                # Method 1: Try direct ModelResponse structure
+                if hasattr(response, 'choices') and response.choices:
+                    choice = response.choices[0]
+                    if hasattr(choice, 'message') and choice.message:
+                        message = choice.message
+                        # Try content first
+                        if hasattr(message, 'content') and message.content and message.content.strip():
+                            content = message.content.strip()
+                            logger.info(f"Successfully generated follow-up question: {content[:100]}...")
+                            return content
+                        # Try reasoning_content if content is empty (for reasoning models)
+                        elif hasattr(message, 'reasoning_content') and message.reasoning_content and message.reasoning_content.strip():
+                            reasoning = message.reasoning_content.strip()
+                            logger.debug(f"Got reasoning content: {reasoning[:200]}...")
+                            
+                            # Extract the actual question from reasoning content
+                            import re
+                            
+                            # Look for questions in quotes
+                            question_patterns = [
+                                r'"([^"]+\?)"',  # "Question ending with ?"
+                                r'"([^"]+)"(?=\s*That|\s*It\'s|\s*Good)',  # "Question" followed by validation words
+                                r'Let\'s craft:\s*"([^"]+)"',  # Let's craft: "Question"
+                                r'craft a question:\s*"([^"]+)"',  # craft a question: "Question"
+                            ]
+                            
+                            for pattern in question_patterns:
+                                question_match = re.search(pattern, reasoning, re.IGNORECASE)
+                                if question_match:
+                                    question = question_match.group(1).strip()
+                                    if len(question) > 10 and ('?' in question or question.endswith('.')):  # Basic validation
+                                        logger.info(f"Extracted question from reasoning: {question[:100]}...")
+                                        return question
+                            
+                            # If no good question found, generate a fallback based on the context
+                            if "follow-up question" in reasoning.lower():
+                                # Generate a generic follow-up question
+                                fallback = "Can you elaborate on that and provide a specific example?"
+                                logger.warning(f"Using fallback question due to parsing failure: {fallback}")
+                                return fallback
+                            
+                            logger.error(f"Could not extract valid question from reasoning: {reasoning[:200]}...")
+                            raise ValueError("Failed to parse LLM response - no valid content found")
+                
+                # Method 2: Try dict-like access on response object
+                try:
+                    if hasattr(response, '__dict__') or hasattr(response, '__getitem__'):
+                        # Try to access as dict or dict-like object
+                        choices = getattr(response, 'choices', None)
+                        if choices and len(choices) > 0:
+                            choice = choices[0]
+                            message = getattr(choice, 'message', None)
+                            if message:
+                                content = getattr(message, 'content', None)
+                                if content and str(content).strip():
+                                    logger.info(f"Successfully generated follow-up question: {str(content)[:100]}...")
+                                    return str(content).strip()
+                except (AttributeError, TypeError, IndexError):
+                    pass
+                
+                # Method 3: Convert to string and extract meaningful content
+                response_str = str(response)
+                logger.debug(f"Raw response: {response_str[:200]}...")
+                
+                # Look for content patterns in the string representation
+                import re
+                content_match = re.search(r"content='([^']+)'", response_str)
+                if content_match:
+                    content = content_match.group(1).strip()
+                    # Filter out system prompts/reasoning that leaked through
+                    if content and not content.startswith("We need to generate") and not content.startswith("The user wants"):
+                        logger.info(f"Successfully extracted question from string: {content[:100]}...")
+                        return content
+                    else:
+                        logger.warning(f"Filtered out invalid question content: {content[:100]}...")
+                
+                # Try alternate content extraction patterns
+                content_match = re.search(r'"content"\s*:\s*"([^"]+)"', response_str)
+                if content_match:
+                    content = content_match.group(1).strip()
+                    if content and not content.startswith("We need to generate") and not content.startswith("The user wants"):
+                        logger.info(f"Successfully extracted question from JSON pattern: {content[:100]}...")
+                        return content
+                
+                # Log detailed debug info
+                logger.error(f"Unable to parse LLM response. Response type: {type(response)}")
+                logger.error(f"Response attributes: {[attr for attr in dir(response) if not attr.startswith('_')]}")
+                if hasattr(response, '__dict__'):
+                    logger.error(f"Response dict: {response.__dict__}")
+                
+            except Exception as parse_error:
+                logger.error(f"Exception during response parsing: {parse_error}")
+                
+            # If we reach here, all parsing methods failed
+            raise ValueError("Failed to parse LLM response - no valid content found")
         except Exception as e:
             logger.warning(f"Failed to generate follow-up question with LLM: {e}")
             # Fallback questions for different follow-up numbers
