@@ -15,7 +15,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 
 @router.get("/", response_model=List[Business])
 def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
-    return session.exec(select(Business)).all()
+    return list(session.exec(select(Business)).all())
 
 
 @router.post("/", response_model=Business, status_code=status.HTTP_201_CREATED)
@@ -60,7 +60,7 @@ def update_business(
 
 
 @router.delete("/{business_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_business(business_id: UUID, session: Session = Depends(get_session)) -> None:
+def delete_business(business_id: UUID, session: Session = Depends(get_session)):
     business = session.get(Business, business_id)
     if not business:
         raise HTTPException(
@@ -68,4 +68,3 @@ def delete_business(business_id: UUID, session: Session = Depends(get_session)) 
         )
     session.delete(business)
     session.commit()
-    return None

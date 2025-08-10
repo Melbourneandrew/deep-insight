@@ -1,17 +1,23 @@
-from __future__ import annotations
-
+from enum import StrEnum
 from uuid import UUID, uuid4
 from typing import List, Optional
 
-from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel, Column, String, ForeignKey
+
+
+class TableName(StrEnum):
+    BUSINESSES = "businesses"
+    EMPLOYEES = "employees"
+    QUESTIONS = "questions"
+    INTERVIEWS = "interviews"
+    RESPONSES = "responses"
 
 
 # ---------- Base (Pydantic) models ----------
 
 
-class BusinessBase(SQLModel):
+class BusinessBase(SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -19,7 +25,7 @@ class BusinessBase(SQLModel):
     name: str = Field(sa_column=Column(String(255), nullable=False))
 
 
-class EmployeeBase(SQLModel):
+class EmployeeBase(SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -28,12 +34,14 @@ class EmployeeBase(SQLModel):
     bio: Optional[str] = None
     business_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("businesses.id"), nullable=False
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.BUSINESSES}.id"),
+            nullable=False,
         ),
     )
 
 
-class QuestionBase(SQLModel):
+class QuestionBase(SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -41,38 +49,48 @@ class QuestionBase(SQLModel):
     content: str
     business_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("businesses.id"), nullable=False
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.BUSINESSES}.id"),
+            nullable=False,
         ),
     )
     is_follow_up: bool = Field(default=False)
 
 
-class InterviewBase(SQLModel):
+class InterviewBase(SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
     )
     business_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("businesses.id"), nullable=False
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.BUSINESSES}.id"),
+            nullable=False,
         ),
     )
 
 
-class QuestionResponseBase(SQLModel):
+class QuestionResponseBase(SQLModel, table=False):
     interview_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("interviews.id"), primary_key=True
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.INTERVIEWS}.id"),
+            primary_key=True,
         ),
     )
     employee_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("employees.id"), primary_key=True
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.EMPLOYEES}.id"),
+            primary_key=True,
         ),
     )
     question_id: UUID = Field(
         sa_column=Column(
-            PGUUID(as_uuid=True), ForeignKey("questions.id"), primary_key=True
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.QUESTIONS}.id"),
+            primary_key=True,
         ),
     )
     content: str
@@ -82,7 +100,7 @@ class QuestionResponseBase(SQLModel):
 
 
 class Business(BusinessBase, table=True):
-    __tablename__ = "businesses"
+    __tablename__: str = TableName.BUSINESSES
 
     employees: List["Employee"] = Relationship(back_populates="business")
     questions: List["Question"] = Relationship(back_populates="business")
@@ -90,28 +108,28 @@ class Business(BusinessBase, table=True):
 
 
 class Employee(EmployeeBase, table=True):
-    __tablename__ = "employees"
+    __tablename__: str = TableName.EMPLOYEES
 
-    business: Optional[Business] = Relationship(back_populates="employees")
+    business: Optional["Business"] = Relationship(back_populates="employees")
     responses: List["QuestionResponse"] = Relationship(back_populates="employee")
 
 
 class Question(QuestionBase, table=True):
-    __tablename__ = "questions"
+    __tablename__: str = TableName.QUESTIONS
 
-    business: Optional[Business] = Relationship(back_populates="questions")
+    business: Optional["Business"] = Relationship(back_populates="questions")
     responses: List["QuestionResponse"] = Relationship(back_populates="question")
 
 
 class Interview(InterviewBase, table=True):
-    __tablename__ = "interviews"
+    __tablename__: str = TableName.INTERVIEWS
 
-    business: Optional[Business] = Relationship(back_populates="interviews")
+    business: Optional["Business"] = Relationship(back_populates="interviews")
     responses: List["QuestionResponse"] = Relationship(back_populates="interview")
 
 
 class QuestionResponse(QuestionResponseBase, table=True):
-    __tablename__ = "responses"
+    __tablename__: str = TableName.RESPONSES
 
     interview: Optional[Interview] = Relationship(back_populates="responses")
     employee: Optional[Employee] = Relationship(back_populates="responses")

@@ -21,7 +21,7 @@ def list_interviews(
     statement = select(Interview)
     if business_id:
         statement = statement.where(Interview.business_id == business_id)
-    return session.exec(statement).all()
+    return list(session.exec(statement).all())
 
 
 @router.post("/", response_model=Interview, status_code=status.HTTP_201_CREATED)
@@ -66,9 +66,7 @@ def update_interview(
 
 
 @router.delete("/{interview_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_interview(
-    interview_id: UUID, session: Session = Depends(get_session)
-) -> None:
+def delete_interview(interview_id: UUID, session: Session = Depends(get_session)):
     interview = session.get(Interview, interview_id)
     if not interview:
         raise HTTPException(
@@ -76,4 +74,3 @@ def delete_interview(
         )
     session.delete(interview)
     session.commit()
-    return None
