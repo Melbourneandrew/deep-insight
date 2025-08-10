@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 from fastapi import Depends
 
 from app.db import get_session
-from app.models.models import Business, Employee, Question, Interview, QuestionResponse
+from app.models.models import Business, Employee, Question, Interview
 from app.services.schemas.schema import (
     SimulateInterviewRequest,
     SimulateInterviewResponse,
@@ -47,12 +47,12 @@ class SimulateInterviewService:
         Raises:
             ValueError: If business not found, or no employees/questions exist
         """
-        # Get the business
+        # Validate business exists (direct DB - no business service)
         business = self.session.get(Business, request.business_id)
         if not business:
             raise ValueError("Business not found")
 
-        # Get all employees for the business
+        # Get all employees for the business (direct DB - no employee service)
         employees = list(self.session.exec(
             select(Employee).where(Employee.business_id == request.business_id)
         ))
@@ -60,7 +60,7 @@ class SimulateInterviewService:
         if not employees:
             raise ValueError("No employees found for this business")
 
-        # Get all base questions to validate there are questions
+        # Get all base questions to validate there are questions (direct DB - no question service for this)
         questions_stmt = (
             select(Question)
             .where(Question.business_id == request.business_id)
@@ -141,11 +141,12 @@ class SimulateInterviewService:
         with Session(engine) as new_session:
             temp_service = SimulateInterviewService(new_session)
             
-            # Create a new interview for this employee
+            # Validate employee exists (direct DB - no employee service)
             employee = new_session.get(Employee, employee_id)
             if not employee:
                 raise ValueError(f"Employee {employee_id} not found")
 
+            # Use start interview service
             start_service = get_start_interview_service(new_session)
             start_request = StartInterviewRequest(employee_id=employee_id)
             start_response = start_service.start_interview(start_request)
@@ -188,13 +189,14 @@ class SimulateInterviewService:
         Raises:
             ValueError: If employee not found or interview/employee don't match
         """
-        # Validate employee exists
+        # Validate employee exists (direct DB - no employee service)
         employee = self.session.get(Employee, request.employee_id)
         if not employee:
             raise ValueError(f"Employee with ID {request.employee_id} not found")
 
         # Get or create interview
         if request.interview_id:
+            # Validate existing interview (direct DB - for validation)
             interview = self.session.get(Interview, request.interview_id)
             if not interview:
                 raise ValueError(f"Interview with ID {request.interview_id} not found")
@@ -203,25 +205,26 @@ class SimulateInterviewService:
             if employee.business_id != interview.business_id:
                 raise ValueError("Employee and interview must belong to the same business")
             
-            # Update interview to be associated with this employee
+            # Update interview to be associated with this employee (direct DB - simple update)
             interview.employee_id = request.employee_id
             self.session.commit()
         else:
-            # Create a new interview
+            # Use start interview service
             start_service = get_start_interview_service(self.session)
             start_request = StartInterviewRequest(employee_id=request.employee_id)
             start_response = start_service.start_interview(start_request)
             
+            # Get the created interview (direct DB - for validation)
             interview = self.session.get(Interview, start_response.interview_id)
             if not interview:
                 raise ValueError(f"Failed to create or retrieve interview {start_response.interview_id}")
 
-        # Get business for response
+        # Get business for response (direct DB - no business service)
         business = self.session.get(Business, interview.business_id)
         if not business:
             raise ValueError("Business not found")
 
-        # Get required services
+        # Use existing services for the interview flow
         next_question_service = get_next_question_service(self.session)
         answer_question_service = get_answer_question_service(self.session)
 
@@ -229,7 +232,7 @@ class SimulateInterviewService:
         max_questions = 50  # Safety limit to prevent infinite loops
 
         for i in range(max_questions):
-            # Get the next question
+            # Use next question service
             next_question_request = NextQuestionRequest(interview_id=interview.id)
             next_question_response = next_question_service.get_next_question(next_question_request)
 
@@ -239,7 +242,7 @@ class SimulateInterviewService:
 
             question_base = next_question_response.question
             
-            # Get the full Question object from the database
+            # Get the full Question object (direct DB - needed for AI response generation)
             question = self.session.get(Question, question_base.id)
             if not question:
                 logger.error(f"Could not find question with ID {question_base.id}")
@@ -248,7 +251,7 @@ class SimulateInterviewService:
             # Generate AI response based on employee bio and question
             ai_response_content = await self._generate_ai_response(employee, question)
 
-            # Save the response using the actual answer question service
+            # Use answer question service
             answer_request = AnswerQuestionRequest(
                 interview_id=interview.id,
                 question_id=question.id,

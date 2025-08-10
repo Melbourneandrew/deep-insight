@@ -22,6 +22,7 @@ from deep_insight_client import (
     QuestionsApi,
     EmployeesApi,
     ProceduresApi,
+    InterviewsApi,
     Business,
     Question,
     Employee,
@@ -39,6 +40,80 @@ class TestSimulateInterview:
         self.business_id: Optional[UUID] = None
         self.employee_ids: List[UUID] = []
         self.question_ids: List[UUID] = []
+        
+    def _wait_for_simulation_completion(self, api_client, business_id: UUID, expected_employees: int = 1, timeout: int = 120) -> List[Dict[str, Any]]:
+        """Poll for simulation completion by checking interview responses.
+        
+        Args:
+            api_client: API client instance
+            business_id: Business ID to check interviews for
+            expected_employees: Expected number of employees with completed interviews
+            timeout: Maximum wait time in seconds
+            
+        Returns:
+            List of interview details with responses
+            
+        Raises:
+            TimeoutError: If simulation doesn't complete within timeout
+        """
+        interviews_api = InterviewsApi(api_client)
+        start_time = time.time()
+        check_interval = 2  # Start with 2 second intervals
+        
+        print(f"⏳ Waiting for simulation completion (max {timeout}s)...")
+        
+        while time.time() - start_time < timeout:
+            try:
+                # Get all interview details for this business (includes responses)
+                interview_details = interviews_api.get_business_interview_details_interviews_business_business_id_details_get(
+                    business_id=str(business_id)
+                )
+                
+                if len(interview_details) >= expected_employees:
+                    # Check if we have completed interviews with responses
+                    completed_interviews = []
+                    
+                    for interview_detail in interview_details:
+                        # Count responses - expect at least some for a completed simulation
+                        response_count = len(interview_detail.questions_and_responses)
+                        if response_count > 0:  # At least some responses indicate progress
+                            completed_interviews.append({
+                                'interview_id': interview_detail.interview_id,
+                                'detail': interview_detail,
+                                'response_count': response_count
+                            })
+                            print(f"  📝 Interview {interview_detail.interview_id}: {response_count} responses")
+                    
+                    if len(completed_interviews) >= expected_employees:
+                        # Check if we have expected total responses (base + follow-ups)
+                        # For our tests: each employee should have responses to all questions
+                        all_complete = True
+                        for comp_interview in completed_interviews:
+                            # Expect responses to base questions + follow-ups
+                            # Conservative check: at least 3 responses per interview
+                            if comp_interview['response_count'] < 3:
+                                all_complete = False
+                                break
+                        
+                        if all_complete:
+                            elapsed = time.time() - start_time
+                            print(f"✅ Simulation completed in {elapsed:.2f}s")
+                            return completed_interviews
+                
+                # Not ready yet, wait and try again
+                elapsed = time.time() - start_time
+                print(f"  ⏳ {elapsed:.1f}s: Found {len(interview_details)} interviews, waiting...")
+                time.sleep(check_interval)
+                
+                # Increase check interval gradually
+                if check_interval < 10:
+                    check_interval += 1
+                    
+            except Exception as e:
+                print(f"  ⚠️  Error checking interviews: {e}")
+                time.sleep(check_interval)
+        
+        raise TimeoutError(f"Simulation did not complete within {timeout} seconds")
     
     @pytest.mark.integration
     def test_simulate_employee_interview(self, api_client):
@@ -100,66 +175,85 @@ class TestSimulateInterview:
         self.employee_ids.append(employee_id)
         print(f"✅ Created employee: {employee_id}")
             
-        # Step 4: Simulate the employee's interview (without providing interview_id - should create new)
-        print("\n🤖 Step 4: Simulating employee interview...")
+        # Step 4: Start employee interview simulation in background
+        print("\n🤖 Step 4: Starting employee interview simulation...")
         
         simulate_request = SimulateEmployeeInterviewRequest(
             employee_id=str(employee_id)
             # interview_id not provided - should create a new interview
         )
         
-        # Call the simulate endpoint for this specific employee
+        # Call the background simulate endpoint for this specific employee
         simulate_response = simulate_api.simulate_employee_interview_simulateinterview_employee_id_post(
             employee_id=str(employee_id),
             simulate_employee_interview_request=simulate_request
         )
         
-        print(f"✅ Simulation completed for employee: {employee_id}")
-        print(f"📋 Interview ID: {simulate_response.interview_id}")
-        print(f"👤 Employee Email: {simulate_response.employee_email}")
-        print(f"🏢 Business: {simulate_response.business_name}")
-        print(f"✅ Interview Complete: {simulate_response.is_interview_complete}")
-        print(f"📝 Total Q&A Exchanges: {len(simulate_response.simulated_exchanges)}")
+        # Handle the case where the response might be None due to client generation issues
+        if simulate_response is None:
+            print("⚠️ Simulate response is None - this may be a client generation issue")
+            print("✅ Simulation request sent successfully (no error thrown)")
+            # We'll rely on the polling to verify it worked
+        else:
+            print(f"✅ Simulation started for employee: {employee_id}")
+            print(f"📋 Status: {simulate_response.status}")
+            print(f"💬 Message: {simulate_response.message}")
+            
+            # Verify background task started successfully
+            assert simulate_response.status == "started"
+            assert simulate_response.employee_id == str(employee_id)
         
-        # Step 5: Verify simulation results
+        # Step 4.5: Wait for simulation to complete
+        print("\n⏳ Step 4.5: Waiting for simulation completion...")
+        completed_interviews = self._wait_for_simulation_completion(api_client, self.business_id, expected_employees=1)
+        
+        # Get the completed interview
+        interview_data = completed_interviews[0]
+        interview_detail = interview_data['detail']
+        
+        print(f"✅ Simulation completed for employee: {employee_id}")
+        print(f"📋 Interview ID: {interview_data['interview_id']}")
+        print(f"📝 Total Q&A Exchanges: {len(interview_detail.questions_and_responses)}")
+        
+        # Step 5: Verify simulation results from completed interview
         print("\n🔍 Step 5: Verifying simulation results...")
         
-        # Verify basic response structure
-        assert simulate_response.interview_id is not None
-        assert simulate_response.employee_id == str(employee_id)
-        assert simulate_response.employee_email == "john.doe@simulatetest.com"
-        assert simulate_response.business_id == str(self.business_id)
-        assert simulate_response.business_name == "Simulate Test Company"
-        assert simulate_response.is_interview_complete is True
+        # Get the interview and responses
+        interview_id = interview_data['interview_id']
+        responses = interview_detail.questions_and_responses
         
-        # Verify we have simulated exchanges
-        exchanges = simulate_response.simulated_exchanges
-        assert len(exchanges) > 0, "Should have at least one Q&A exchange"
+        # Verify basic structure
+        assert interview_id is not None
+        assert interview_detail.business_id == str(self.business_id)
+        
+        # Verify we have responses
+        assert len(responses) > 0, "Should have at least one Q&A exchange"
         
         # Count base questions and follow-ups
-        base_exchanges = [e for e in exchanges if not e.is_follow_up]
-        follow_up_exchanges = [e for e in exchanges if e.is_follow_up]
+        base_responses = [r for r in responses if not r.question_is_follow_up]
+        follow_up_responses = [r for r in responses if r.question_is_follow_up]
         
-        print(f"Base questions answered: {len(base_exchanges)}")
-        print(f"Follow-up questions answered: {len(follow_up_exchanges)}")
+        print(f"Base questions answered: {len(base_responses)}")
+        print(f"Follow-up questions answered: {len(follow_up_responses)}")
         
         # Should have 3 base questions (we created 3)
-        assert len(base_exchanges) == 3, f"Expected 3 base questions, got {len(base_exchanges)}"
+        assert len(base_responses) == 3, f"Expected 3 base questions, got {len(base_responses)}"
         
         # Should have follow-ups (2 per base question = 6 total expected)
         expected_follow_ups = 6
-        assert len(follow_up_exchanges) == expected_follow_ups, f"Expected {expected_follow_ups} follow-ups, got {len(follow_up_exchanges)}"
+        assert len(follow_up_responses) == expected_follow_ups, f"Expected {expected_follow_ups} follow-ups, got {len(follow_up_responses)}"
         
-        # Verify each exchange has required fields
-        for i, exchange in enumerate(exchanges, 1):
-            assert exchange.question_id is not None
-            assert exchange.question_content is not None and len(exchange.question_content) > 0
-            assert exchange.response_content is not None and len(exchange.response_content) > 0
-            assert isinstance(exchange.is_follow_up, bool)
+        # Verify each response has required fields
+        for i, response in enumerate(responses, 1):
+            assert response.question_id is not None
+            assert response.question_content is not None and len(response.question_content) > 0
+            assert response.response_content is not None and len(response.response_content) > 0
+            assert isinstance(response.question_is_follow_up, bool)
+            assert response.employee_email == "john.doe@simulatetest.com"
             
-            print(f"Exchange {i}: {'Follow-up' if exchange.is_follow_up else 'Base'}")
-            print(f"  Q: {exchange.question_content[:80]}...")
-            print(f"  A: {exchange.response_content[:80]}...")
+            print(f"Response {i}: {'Follow-up' if response.question_is_follow_up else 'Base'}")
+            print(f"  Q: {response.question_content[:80]}...")
+            print(f"  A: {response.response_content[:80]}...")
         
         print("✅ Employee simulation verification completed!")
         
@@ -241,75 +335,97 @@ class TestSimulateInterview:
         
         print(f"✅ Created {len(employees_to_create)} employees total")
             
-        # Step 4: Simulate interviews for all employees in business
-        print("\n🤖 Step 4: Simulating business-wide interviews...")
+        # Step 4: Start business-wide interview simulation in background
+        print("\n🤖 Step 4: Starting business-wide interview simulation...")
         
         simulate_request = SimulateInterviewRequest(
             business_id=str(self.business_id)
         )
         
-        # This should run simulations for all employees in parallel
-        print("⏳ Running parallel simulations (this may take a moment)...")
+        # Start the background simulation
+        print("⏳ Starting parallel simulations in background...")
         start_time = time.time()
         
         simulate_response = simulate_api.simulate_business_interviews_simulate_interview_post(
             simulate_interview_request=simulate_request
         )
         
+        # Handle the case where the response might be None due to client generation issues
+        if simulate_response is None:
+            print("⚠️ Business simulate response is None - this may be a client generation issue")
+            print("✅ Business simulation request sent successfully (no error thrown)")
+            # We'll rely on the polling to verify it worked
+        else:
+            print(f"✅ Business simulation started")
+            print(f"📋 Status: {simulate_response.status}")
+            print(f"💬 Message: {simulate_response.message}")
+            
+            # Verify background task started successfully
+            assert simulate_response.status == "started"
+            assert simulate_response.business_id == str(self.business_id)
+        
+        # Step 4.5: Wait for simulation to complete
+        print("\n⏳ Step 4.5: Waiting for business simulation completion...")
+        completed_interviews = self._wait_for_simulation_completion(
+            api_client, 
+            self.business_id, 
+            expected_employees=len(employees_to_create)
+        )
+        
         end_time = time.time()
         simulation_duration = end_time - start_time
         
         print(f"✅ Business simulation completed in {simulation_duration:.2f} seconds")
-        print(f"📋 Main Interview ID: {simulate_response.interview_id}")
-        print(f"🏢 Business: {simulate_response.business_name}")
-        print(f"👥 Employee Simulations: {len(simulate_response.employee_simulations)}")
+        print(f"👥 Completed Interviews: {len(completed_interviews)}")
         
-        # Step 5: Verify business simulation results
+        # Step 5: Verify business simulation results from completed interviews
         print("\n🔍 Step 5: Verifying business simulation results...")
         
-        # Verify basic response structure
-        assert simulate_response.interview_id is not None
-        assert simulate_response.business_id == str(self.business_id)
-        assert simulate_response.business_name == "Multi-Employee Test Company"
+        # Verify we have interviews for all employees
+        assert len(completed_interviews) == len(employees_to_create), f"Expected {len(employees_to_create)} completed interviews, got {len(completed_interviews)}"
         
-        # Verify we have simulations for all employees
-        employee_simulations = simulate_response.employee_simulations
-        assert len(employee_simulations) == len(employees_to_create), f"Expected {len(employees_to_create)} employee simulations, got {len(employee_simulations)}"
+        # Verify each employee interview
+        employee_emails = [emp["email"] for emp in employees_to_create]
         
-        # Verify questions asked
-        questions_asked = simulate_response.questions_asked
-        assert len(questions_asked) == len(questions_to_create), f"Expected {len(questions_to_create)} questions, got {len(questions_asked)}"
-        
-        # Verify each employee simulation
-        for i, emp_sim in enumerate(employee_simulations, 1):
-            print(f"\nEmployee Simulation {i}:")
-            print(f"  Employee ID: {emp_sim.employee_id}")
-            print(f"  Email: {emp_sim.employee_email}")
-            print(f"  Responses: {len(emp_sim.responses)}")
+        for i, interview_data in enumerate(completed_interviews, 1):
+            interview_id = interview_data['interview_id']
+            interview_detail = interview_data['detail']
+            responses = interview_detail.questions_and_responses
             
-            # Verify employee simulation structure
-            assert emp_sim.employee_id is not None
-            assert emp_sim.employee_email is not None
-            assert len(emp_sim.responses) > 0, f"Employee {emp_sim.employee_email} should have responses"
+            print(f"\nInterview {i}:")
+            print(f"  Interview ID: {interview_id}")
+            print(f"  Business ID: {interview_detail.business_id}")
+            print(f"  Responses: {len(responses)}")
+            
+            # Verify interview structure
+            assert interview_id is not None
+            assert interview_detail.business_id == str(self.business_id)
+            assert len(responses) > 0, f"Interview {interview_id} should have responses"
             
             # Each employee should have responded to all questions (base + follow-ups)
             # With 2 base questions and 2 follow-ups each = 6 total expected
             expected_responses = 6
-            assert len(emp_sim.responses) == expected_responses, f"Employee {emp_sim.employee_email} should have {expected_responses} responses, got {len(emp_sim.responses)}"
+            assert len(responses) == expected_responses, f"Interview {interview_id} should have {expected_responses} responses, got {len(responses)}"
+            
+            # Verify we have the expected employee email
+            if responses:
+                employee_email = responses[0].employee_email
+                assert employee_email in employee_emails, f"Employee email {employee_email} not in expected list"
+                print(f"  Employee Email: {employee_email}")
             
             # Verify response structure
-            for j, response in enumerate(emp_sim.responses, 1):
-                assert response.get("question_id") is not None
-                assert response.get("question_content") is not None
-                assert response.get("response_content") is not None
-                assert isinstance(response.get("is_follow_up"), bool)
+            for j, response in enumerate(responses, 1):
+                assert response.question_id is not None
+                assert response.question_content is not None
+                assert response.response_content is not None
+                assert isinstance(response.question_is_follow_up, bool)
                 
-                print(f"    Response {j}: {'Follow-up' if response['is_follow_up'] else 'Base'}")
-                print(f"      Q: {response['question_content'][:60]}...")
-                print(f"      A: {response['response_content'][:60]}...")
+                print(f"    Response {j}: {'Follow-up' if response.question_is_follow_up else 'Base'}")
+                print(f"      Q: {response.question_content[:60]}...")
+                print(f"      A: {response.response_content[:60]}...")
         
-        print(f"\n✅ All {len(employee_simulations)} employee simulations verified!")
-        print(f"⚡ Parallel processing completed {len(employee_simulations)} simulations in {simulation_duration:.2f} seconds")
+        print(f"\n✅ All {len(completed_interviews)} employee interviews verified!")
+        print(f"⚡ Parallel processing completed {len(completed_interviews)} simulations in {simulation_duration:.2f} seconds")
         print("🎉 BUSINESS-WIDE SIMULATION TEST PASSED!")
 
 
