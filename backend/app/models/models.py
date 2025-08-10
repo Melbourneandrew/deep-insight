@@ -2,6 +2,9 @@ from enum import StrEnum
 from uuid import UUID, uuid4
 from typing import List, Optional
 
+from datetime import datetime
+from datetime import timezone
+
 from sqlmodel import (
     Column,
     String,
@@ -24,7 +27,13 @@ class TableName(StrEnum):
 # ---------- Base (Pydantic) models ----------
 
 
-class BusinessBase(SQLModel, table=False):
+class TimestampMixin(SQLModel):
+    created_at: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc), nullable=True
+    )
+
+
+class BusinessBase(TimestampMixin, SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -32,7 +41,7 @@ class BusinessBase(SQLModel, table=False):
     name: str = Field(sa_column=Column(String(255), nullable=False))
 
 
-class EmployeeBase(SQLModel, table=False):
+class EmployeeBase(TimestampMixin, SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -48,7 +57,7 @@ class EmployeeBase(SQLModel, table=False):
     )
 
 
-class QuestionBase(SQLModel, table=False):
+class QuestionBase(TimestampMixin, SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -65,7 +74,7 @@ class QuestionBase(SQLModel, table=False):
     is_follow_up: bool = Field(default=False)
 
 
-class InterviewBase(SQLModel, table=False):
+class InterviewBase(TimestampMixin, SQLModel, table=False):
     id: UUID = Field(
         default_factory=uuid4,
         sa_column=Column(PGUUID(as_uuid=True), primary_key=True),
@@ -86,7 +95,7 @@ class InterviewBase(SQLModel, table=False):
     )
 
 
-class QuestionResponseBase(SQLModel, table=False):
+class QuestionResponseBase(TimestampMixin, SQLModel, table=False):
     interview_id: UUID = Field(
         sa_column=Column(
             PGUUID(as_uuid=True),

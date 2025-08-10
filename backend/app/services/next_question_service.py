@@ -2,22 +2,25 @@ import os
 from typing import List, Optional
 from uuid import UUID, uuid4
 from sqlmodel import Session, select
-
-from app.models.models import Interview, Question, QuestionResponse
+from fastapi import Depends
 from app.services.schemas.schema import NextQuestionRequest, NextQuestionResponse
+from app.models.models import Interview, Question, QuestionResponse
+from app.db import get_session
 import litellm
 
 
 class NextQuestionService:
     """Service for getting the next question in an interview"""
 
-    def get_next_question(self, request: NextQuestionRequest, session: Session) -> NextQuestionResponse:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_next_question(self, request: NextQuestionRequest) -> NextQuestionResponse:
         """
         Get the next question for an interview
 
         Args:
             request: NextQuestionRequest containing interview_id
-            session: Database session
 
         Returns:
             NextQuestionResponse containing question and is_interview_over flag
@@ -26,51 +29,50 @@ class NextQuestionService:
             ValueError: If interview not found
         """
         # Validate that the interview exists
-        interview = session.get(Interview, request.interview_id)
+        interview = self.session.get(Interview, request.interview_id)
         if not interview:
             raise ValueError("Interview not found")
         
         # Get all base questions for this business
-        base_questions = self._get_base_questions(interview.business_id, session)
+        base_questions = self._get_base_questions(interview.business_id)
         if not base_questions:
             return NextQuestionResponse(question=None, is_interview_over=True)
         
         # Get all responses for this interview
-        responses = self._get_interview_responses(request.interview_id, session)
+        responses = self._get_interview_responses(request.interview_id)
         
         # Determine what the next question should be
-        next_question = self._determine_next_question(base_questions, responses, interview, session)
+        next_question = self._determine_next_question(base_questions, responses, interview)
         
         if next_question is None:
             return NextQuestionResponse(question=None, is_interview_over=True)
         
         return NextQuestionResponse(question=next_question, is_interview_over=False)
 
-    def _get_base_questions(self, business_id: UUID, session: Session) -> List[Question]:
+    def _get_base_questions(self, business_id: UUID) -> List[Question]:
         """Get all base questions for a business, ordered by index."""
         statement = (
             select(Question)
             .where(Question.business_id == business_id)
             .where(Question.is_follow_up == False)
         )
-        base_questions_raw = list(session.exec(statement))
+        base_questions_raw = list(self.session.exec(statement))
         # Sort by order_index manually to handle None values
         return sorted(base_questions_raw, key=lambda q: q.order_index if q.order_index is not None else 999)
     
-    def _get_interview_responses(self, interview_id: UUID, session: Session) -> List[QuestionResponse]:
+    def _get_interview_responses(self, interview_id: UUID) -> List[QuestionResponse]:
         """Get all responses for an interview."""
         statement = (
             select(QuestionResponse)
             .where(QuestionResponse.interview_id == interview_id)
         )
-        return list(session.exec(statement))
+        return list(self.session.exec(statement))
 
     def _determine_next_question(
         self,
         base_questions: List[Question],
         responses: List[QuestionResponse],
-        interview: Interview,
-        session: Session
+        interview: Interview
     ) -> Optional[Question]:
         """Determine what the next question should be based on interview state."""
         
@@ -80,24 +82,24 @@ class NextQuestionService:
         
         # Get the last question that was answered
         last_response = responses[-1]
-        last_question = session.get(Question, last_response.question_id)
+        last_question = self.session.get(Question, last_response.question_id)
         
         if not last_question:
             return None
         
         if not last_question.is_follow_up:
             # Just answered a base question, generate first follow-up
-            return self._generate_follow_up_question(responses, interview, session, 1)
+            return self._generate_follow_up_question(responses, interview, 1)
         else:
             # This was a follow-up question
-            follow_up_count = self._count_recent_follow_ups(responses, session)
+            follow_up_count = self._count_recent_follow_ups(responses)
             
             if follow_up_count < 2:
                 # Generate second follow-up
-                return self._generate_follow_up_question(responses, interview, session, follow_up_count + 1)
+                return self._generate_follow_up_question(responses, interview, follow_up_count + 1)
             else:
                 # Move to next base question
-                current_base_index = self._get_current_base_question_index(responses, base_questions, session)
+                current_base_index = self._get_current_base_question_index(responses, base_questions)
                 next_base_index = current_base_index + 1
                 
                 if next_base_index < len(base_questions):
@@ -106,13 +108,13 @@ class NextQuestionService:
                     # All questions completed
                     return None
     
-    def _count_recent_follow_ups(self, responses: List[QuestionResponse], session: Session) -> int:
+    def _count_recent_follow_ups(self, responses: List[QuestionResponse]) -> int:
         """Count how many follow-up questions have been asked since the last base question."""
         count = 0
         
         # Count backwards from the most recent response
         for response in reversed(responses):
-            question = session.get(Question, response.question_id)
+            question = self.session.get(Question, response.question_id)
             if question and question.is_follow_up:
                 count += 1
             else:
@@ -124,14 +126,13 @@ class NextQuestionService:
     def _get_current_base_question_index(
         self,
         responses: List[QuestionResponse],
-        base_questions: List[Question],
-        session: Session
+        base_questions: List[Question]
     ) -> int:
         """Find the index of the current base question being worked on."""
         
         # Look backwards through responses to find the most recent base question
         for response in reversed(responses):
-            question = session.get(Question, response.question_id)
+            question = self.session.get(Question, response.question_id)
             if question and not question.is_follow_up:
                 # Find this question in the base_questions list
                 for i, base_q in enumerate(base_questions):
@@ -145,13 +146,12 @@ class NextQuestionService:
         self,
         responses: List[QuestionResponse],
         interview: Interview,
-        session: Session,
         follow_up_number: int
     ) -> Question:
         """Generate a follow-up question using LiteLLM."""
         
         # Build conversation history for context
-        conversation_history = self._build_conversation_history(responses, session)
+        conversation_history = self._build_conversation_history(responses)
         
         # Generate question using LiteLLM
         question_content = self._generate_question_with_llm(conversation_history, follow_up_number)
@@ -165,19 +165,19 @@ class NextQuestionService:
             order_index=None  # Follow-ups don't have order indices
         )
         
-        session.add(generated_question)
-        session.commit()
-        session.refresh(generated_question)
+        self.session.add(generated_question)
+        self.session.commit()
+        self.session.refresh(generated_question)
         
         return generated_question
     
-    def _build_conversation_history(self, responses: List[QuestionResponse], session: Session) -> List[dict]:
+    def _build_conversation_history(self, responses: List[QuestionResponse]) -> List[dict]:
         """Build conversation history in assistant/user format for LLM context."""
         conversation = []
         
         for response in responses:
             # Get the question content
-            question = session.get(Question, response.question_id)
+            question = self.session.get(Question, response.question_id)
             if question:
                 # Assistant asks question
                 conversation.append({
@@ -264,10 +264,8 @@ Respond with ONLY the question text, no additional formatting or explanation."""
             return fallback_questions[(follow_up_number - 1) % len(fallback_questions)]
 
 
-# Global service instance
-next_question_service = NextQuestionService()
-
-
-def get_next_question_service() -> NextQuestionService:
-    """Get the global next question service instance."""
-    return next_question_service
+def get_next_question_service(
+    session: Session = Depends(get_session),
+) -> NextQuestionService:
+    """Get NextQuestionService with injected dependencies"""
+    return NextQuestionService(session)

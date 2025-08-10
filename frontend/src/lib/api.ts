@@ -21,6 +21,35 @@ export interface CreateBusinessRequest {
   seed_data?: BusinessSeedData;
 }
 
+// Types for interview simulation
+export interface SimulateInterviewRequest {
+  business_id: string;
+}
+
+export interface EmployeeSimulation {
+  employee_id: string;
+  employee_email: string;
+  responses: Array<{
+    question_id: string;
+    question_content: string;
+    response_content: string;
+    is_follow_up: boolean;
+  }>;
+}
+
+export interface SimulateInterviewResponse {
+  interview_id: string;
+  business_id: string;
+  business_name: string;
+  employee_simulations: EmployeeSimulation[];
+  questions_asked: Array<{
+    question_id: string;
+    content: string;
+    is_follow_up: boolean;
+    order_index?: number;
+  }>;
+}
+
 export const api = {
   businesses: {
     list: () => fetch(`${API_BASE_URL}/businesses/`),
@@ -109,6 +138,47 @@ export const api = {
     delete: (id: string) =>
       fetch(`${API_BASE_URL}/questions/${id}`, {
         method: "DELETE",
+      }),
+  },
+  interviews: {
+    list: (businessId?: string) =>
+      fetch(
+        `${API_BASE_URL}/interviews/${
+          businessId ? `?business_id=${businessId}` : ""
+        }`
+      ),
+    create: (interview: { business_id: string }) =>
+      fetch(`${API_BASE_URL}/interviews/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(interview),
+      }),
+    get: (id: string) => fetch(`${API_BASE_URL}/interviews/${id}`),
+    update: (id: string, interview: { business_id?: string }) =>
+      fetch(`${API_BASE_URL}/interviews/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(interview),
+      }),
+    delete: (id: string) =>
+      fetch(`${API_BASE_URL}/interviews/${id}`, {
+        method: "DELETE",
+      }),
+    getBusinessDetails: (businessId: string) =>
+      fetch(`${API_BASE_URL}/interviews/business/${businessId}/details`),
+  },
+  simulate: {
+    interview: (request: SimulateInterviewRequest) =>
+      fetch(`${API_BASE_URL}/simulate/interview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
       }),
   },
 };

@@ -38,7 +38,7 @@ class AnswerQuestionResponse(BaseModel):
 
 # Business Creation schemas
 class EmployeeSeedData(BaseModel):
-    email: str
+    email: str  # Username will be extracted and domain replaced with business name
     bio: Optional[str] = None
 
 
@@ -55,3 +55,22 @@ class BusinessSeedData(BaseModel):
 class CreateBusinessRequest(BaseModel):
     name: str
     seed_data: Optional[BusinessSeedData] = None
+
+
+# Simulate Interview schemas
+class SimulateInterviewRequest(BaseModel):
+    business_id: UUID
+
+
+class EmployeeSimulation(BaseModel):
+    employee_id: UUID
+    employee_email: str
+    responses: List[Dict[str, Any]]
+
+
+class SimulateInterviewResponse(BaseModel):
+    interview_id: UUID
+    business_id: UUID
+    business_name: str
+    employee_simulations: List[EmployeeSimulation]
+    questions_asked: List[Dict[str, Any]]
