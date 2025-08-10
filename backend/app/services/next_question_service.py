@@ -238,10 +238,10 @@ Respond with ONLY the question text, no additional formatting or explanation."""
             # Extract content using robust attribute access
             try:
                 # Method 1: Try direct ModelResponse structure
-                if hasattr(response, 'choices') and response.choices:
-                    choice = response.choices[0]
-                    if hasattr(choice, 'message') and choice.message:
-                        message = choice.message
+                if hasattr(response, 'choices') and response.choices: # type: ignore
+                    choice = response.choices[0] # type: ignore
+                    if hasattr(choice, 'message') and choice.message: # type: ignore
+                        message = choice.message # type: ignore
                         # Try content first
                         if hasattr(message, 'content') and message.content and message.content.strip():
                             content = message.content.strip()
@@ -270,13 +270,6 @@ Respond with ONLY the question text, no additional formatting or explanation."""
                                     if len(question) > 10 and ('?' in question or question.endswith('.')):  # Basic validation
                                         logger.info(f"Extracted question from reasoning: {question[:100]}...")
                                         return question
-                            
-                            # If no good question found, generate a fallback based on the context
-                            if "follow-up question" in reasoning.lower():
-                                # Generate a generic follow-up question
-                                fallback = "Can you elaborate on that and provide a specific example?"
-                                logger.warning(f"Using fallback question due to parsing failure: {fallback}")
-                                return fallback
                             
                             logger.error(f"Could not extract valid question from reasoning: {reasoning[:200]}...")
                             raise ValueError("Failed to parse LLM response - no valid content found")
@@ -333,15 +326,8 @@ Respond with ONLY the question text, no additional formatting or explanation."""
             # If we reach here, all parsing methods failed
             raise ValueError("Failed to parse LLM response - no valid content found")
         except Exception as e:
-            logger.warning(f"Failed to generate follow-up question with LLM: {e}")
-            # Fallback questions for different follow-up numbers
-            fallback_questions = [
-                "Can you tell me more about that?",
-                "What was your experience with that situation?",
-                "How did that make you feel?",
-                "What would you do differently next time?",
-            ]
-            return fallback_questions[(follow_up_number - 1) % len(fallback_questions)]
+            logger.error(f"Failed to generate follow-up question with LLM: {e}")
+            raise ValueError(f"LLM question generation failed: {e}")
 
 
 def get_next_question_service(

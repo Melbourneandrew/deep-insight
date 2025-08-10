@@ -10,6 +10,5 @@
       "database": "app",
       "username": "postgres"
     }
-  ],
-  "python-envs.pythonProjects": []
+  ]
 }
