@@ -27,7 +27,7 @@ def list_responses(
         statement = statement.where(QuestionResponse.employee_id == employee_id)
     if question_id:
         statement = statement.where(QuestionResponse.question_id == question_id)
-    return session.exec(statement).all()
+    return list(session.exec(statement).all())
 
 
 @router.post("/", response_model=QuestionResponse, status_code=status.HTTP_201_CREATED)

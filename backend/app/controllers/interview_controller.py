@@ -37,7 +37,7 @@ def list_interviews(
     statement = select(Interview)
     if business_id:
         statement = statement.where(Interview.business_id == business_id)
-    return session.exec(statement).all()
+    return list(session.exec(statement).all())
 
 
 @router.post("/", response_model=Interview, status_code=status.HTTP_201_CREATED)

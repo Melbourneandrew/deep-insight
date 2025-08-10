@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+When writing tests, use the generated client `deep-insight-client` in the backend.
+In the frontend, use the generated client in the `src/api` folder.
+
+After making changes to the backend, run the following command in the root directory to update the client: `npm run gen`

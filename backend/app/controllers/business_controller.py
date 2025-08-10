@@ -18,7 +18,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 
 @router.get("/", response_model=List[Business])
 def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
-    return session.exec(select(Business)).all()
+    return list(session.exec(select(Business)).all())
 
 
 def _generate_employee_email(original_email: str, business_name: str) -> str:
