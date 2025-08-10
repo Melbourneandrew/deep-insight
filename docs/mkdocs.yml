@@ -3,18 +3,18 @@ site_name: Application Documentation
 theme:
   name: material
   palette:
-    - scheme: slate        # dark mode
-      primary: black
-      accent: cyan         # neon-ish accent
+  - scheme: default
+    primary: black
+    accent: cyan
   font:
-    text: "Space Grotesk"  # geometric, futuristic
-    code: "JetBrains Mono"
+    text: Space Grotesk
+    code: JetBrains Mono
   features:
-    - navigation.expand
-    - navigation.top
-    - search.highlight
-    - search.share
-    - content.code.copy
+  - navigation.expand
+  - navigation.top
+  - search.highlight
+  - search.share
+  - content.code.copy
 nav:
 markdown_extensions:
 - tables
@@ -35,4 +35,4 @@ plugins:
 - search
 - render_swagger
 extra_css:
-  - styles/neo.css
+- styles/neo.css
