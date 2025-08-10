@@ -130,8 +130,11 @@ class TestEmployeeCRUD:
         assert len(employees_business1) == 1
         assert str(employees_business1[0].id) == str(created_employee1.id)
 
-        assert len(employees_business2) == 1
-        assert str(employees_business2[0].id) == str(created_employee2.id)
+        # Second business will have 5 seeded employees + 1 created by test = 6 total
+        assert len(employees_business2) == 6
+        # Find our created employee among the results
+        created_employee_ids = [str(emp.id) for emp in employees_business2]
+        assert str(created_employee2.id) in created_employee_ids
 
     def test_get_employee_by_id(self, api_client, sample_employee_data: dict):
         """Test retrieving a specific employee by ID."""

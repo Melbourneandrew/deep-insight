@@ -6,10 +6,11 @@ import pytest
 import logging
 import tempfile
 import uuid
+import time
 from pathlib import Path
 from typing import Generator, Any
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, text
 from py_pglite.config import PGliteConfig
 from py_pglite.sqlalchemy import SQLAlchemyPGliteManager
 
@@ -20,13 +21,13 @@ from app.models.models import Business, Employee
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def pglite_manager() -> Generator[SQLAlchemyPGliteManager, None, None]:
-    """Create a PGlite database manager for the test session."""
+    """Create a PGlite database manager for the test module - much faster than per-function."""
     # Create unique configuration to prevent socket conflicts
     config = PGliteConfig()
 
-    # Create a unique socket directory for this test session
+    # Create a unique socket directory for this test module
     # PGlite expects socket_path to be the full path including .s.PGSQL.5432
     socket_dir = Path(tempfile.gettempdir()) / f"py-pglite-test-{uuid.uuid4().hex[:8]}"
     socket_dir.mkdir(mode=0o700, exist_ok=True)  # Restrict to user only
@@ -42,33 +43,89 @@ def pglite_manager() -> Generator[SQLAlchemyPGliteManager, None, None]:
         manager.stop()
 
 
+@pytest.fixture(scope="module")
+def pglite_engine(pglite_manager: SQLAlchemyPGliteManager):
+    """Get the SQLAlchemy engine from the PGlite manager."""
+    return pglite_manager.get_engine()
+
+
+def _clean_database_data(engine):
+    """Clean all data from database tables efficiently."""
+    retry_count = 3
+    for attempt in range(retry_count):
+        try:
+            with engine.connect() as conn:
+                # Get all table names from our models
+                result = conn.execute(
+                    text("""
+                    SELECT table_name
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                    AND table_type = 'BASE TABLE'
+                """)
+                )
+
+                table_names = [row[0] for row in result]
+                logger.debug(f"Found tables to clean: {table_names}")
+
+                if table_names:
+                    # Disable foreign key checks for faster cleanup
+                    conn.execute(text("SET session_replication_role = replica;"))
+
+                    # Truncate all tables
+                    for table_name in table_names:
+                        conn.execute(
+                            text(
+                                f'TRUNCATE TABLE "{table_name}" '
+                                "RESTART IDENTITY CASCADE;"
+                            )
+                        )
+
+                    # Re-enable foreign key checks
+                    conn.execute(text("SET session_replication_role = DEFAULT;"))
+
+                    # Commit the cleanup
+                    conn.commit()
+                    logger.debug("Database cleanup completed successfully")
+                else:
+                    logger.debug("No tables found to clean")
+                break  # Success, exit retry loop
+
+        except Exception as e:
+            logger.debug(f"Database cleanup attempt {attempt + 1} failed: {e}")
+            if attempt == retry_count - 1:
+                logger.warning(
+                    "Database cleanup failed after all retries, continuing anyway"
+                )
+            else:
+                time.sleep(0.1)  # Brief pause before retry
+
+
 @pytest.fixture(name="session")
 def session_fixture(
-    pglite_manager: SQLAlchemyPGliteManager,
+    pglite_engine,
 ) -> Generator[Session, None, None]:
-    """Create a test database session using PGlite with proper cleanup."""
-    engine = pglite_manager.get_engine()
-
-    # Create tables
-    SQLModel.metadata.create_all(engine)
+    """Create a test database session with efficient cleanup between tests."""
+    # Create tables once per module
+    SQLModel.metadata.create_all(pglite_engine)
+    
+    # Clean up data before test starts
+    _clean_database_data(pglite_engine)
 
     # Create session
-    session = Session(engine)
+    session = Session(pglite_engine)
 
     try:
         yield session
     finally:
-        # Clean up after each test
+        # Close the session safely
         try:
-            # Clean up data in reverse dependency order
-            for table in reversed(SQLModel.metadata.sorted_tables):
-                session.execute(table.delete())
-            session.commit()
-        except Exception as e:
-            logger.warning(f"Error during cleanup: {e}")
-            session.rollback()
-        finally:
             session.close()
+        except Exception as e:
+            logger.warning(f"Error closing session: {e}")
+        
+        # Clean up data after test completes for next test
+        _clean_database_data(pglite_engine)
 
 
 @pytest.fixture(name="test_business")
@@ -114,9 +171,9 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture(scope="session")
-def test_server(pglite_manager: SQLAlchemyPGliteManager):
-    """Start a test server with PGlite database."""
+@pytest.fixture(scope="module")
+def test_server(pglite_engine):
+    """Start a test server with PGlite database for the test module."""
     import uvicorn
     import threading
     import socket
@@ -134,8 +191,8 @@ def test_server(pglite_manager: SQLAlchemyPGliteManager):
 
     port = find_free_port()
 
-    # Override the database session to use our test database
-    engine = pglite_manager.get_engine()
+    # Use the passed engine instead of creating a new one
+    engine = pglite_engine
     from sqlmodel import Session, SQLModel
 
     # Create tables in the test database
