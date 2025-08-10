@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 
 from app.models.models import QuestionBase
@@ -34,3 +34,24 @@ class AnswerQuestionRequest(BaseModel):
 class AnswerQuestionResponse(BaseModel):
     success: bool
     interview_id: UUID
+
+
+# Business Creation schemas
+class EmployeeSeedData(BaseModel):
+    email: str
+    bio: Optional[str] = None
+
+
+class QuestionSeedData(BaseModel):
+    content: str
+    is_follow_up: bool = False
+
+
+class BusinessSeedData(BaseModel):
+    employees: List[EmployeeSeedData] = []
+    questions: List[QuestionSeedData] = []
+
+
+class CreateBusinessRequest(BaseModel):
+    name: str
+    seed_data: Optional[BusinessSeedData] = None

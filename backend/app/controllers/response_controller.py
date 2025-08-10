@@ -103,7 +103,7 @@ def delete_response(
     employee_id: UUID,
     question_id: UUID,
     session: Session = Depends(get_session),
-) -> None:
+):
     response = session.get(
         QuestionResponse,
         {
@@ -118,4 +118,3 @@ def delete_response(
         )
     session.delete(response)
     session.commit()
-    return None

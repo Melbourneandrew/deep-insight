@@ -66,7 +66,7 @@ def update_question(
 
 
 @router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_question(question_id: UUID, session: Session = Depends(get_session)) -> None:
+def delete_question(question_id: UUID, session: Session = Depends(get_session)):
     question = session.get(Question, question_id)
     if not question:
         raise HTTPException(
@@ -74,4 +74,3 @@ def delete_question(question_id: UUID, session: Session = Depends(get_session)) 
         )
     session.delete(question)
     session.commit()
-    return None

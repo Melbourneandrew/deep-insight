@@ -1,11 +1,15 @@
-from __future__ import annotations
-
 from uuid import UUID, uuid4
 from typing import List, Optional
 
-from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import (
+    Column,
+    String,
+    ForeignKey,
+    Field,
+    Relationship,
+    SQLModel,
+    UUID as PGUUID,
+)
 
 
 # ---------- Base (Pydantic) models ----------
