@@ -86,6 +86,13 @@ class InterviewBase(TimestampMixin, SQLModel, table=False):
             nullable=False,
         ),
     )
+    employee_id: UUID = Field(
+        sa_column=Column(
+            PGUUID(as_uuid=True),
+            ForeignKey(f"{TableName.EMPLOYEES}.id"),
+            nullable=False,
+        ),
+    )
 
 
 class QuestionResponseBase(TimestampMixin, SQLModel, table=False):
@@ -142,6 +149,7 @@ class Interview(InterviewBase, table=True):
     __tablename__: str = TableName.INTERVIEWS
 
     business: Optional["Business"] = Relationship(back_populates="interviews")
+    employee: Optional["Employee"] = Relationship()
     responses: List["QuestionResponse"] = Relationship(back_populates="interview")
 
 

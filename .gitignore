@@ -4,5 +4,6 @@ node_modules
 .env.*
 openapi.json
 __pycache__
+**/__pycache__
 frontend/src/api
 deep-insight-client

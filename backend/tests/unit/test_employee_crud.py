@@ -9,12 +9,14 @@ import pytest
 from uuid import UUID
 from typing import List
 from fastapi.testclient import TestClient
+from datetime import datetime
 
 from deep_insight_client import (
     EmployeesApi,
     BusinessesApi,
     Employee,
     Business,
+    CreateBusinessRequest,
     ApiException,
 )
 
@@ -94,9 +96,10 @@ class TestEmployeeCRUD:
         businesses_api = BusinessesApi(api_client)
 
         # Create a second business
-        business2 = Business(name="Second Company")
         created_business2 = businesses_api.create_business_businesses_post(
-            business=business2
+            create_business_request=CreateBusinessRequest(
+                name="Second Company"
+            )
         )
 
         # Create employees for different businesses
@@ -328,6 +331,7 @@ class TestEmployeeValidation:
             "email": "test@example.com",
             "bio": "Developer",
             "business_id": str(test_business.id),
+            "created_at": datetime.now(),
         }
 
         employee = Employee(**employee_data)
@@ -346,6 +350,7 @@ class TestEmployeeValidation:
             "email": "test@example.com",
             "bio": "Developer",
             "business_id": str(test_business.id),
+            "created_at": datetime.now(),
         }
 
         employee = Employee(**employee_data)
