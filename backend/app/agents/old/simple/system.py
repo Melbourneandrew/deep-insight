@@ -66,8 +66,12 @@ graph TB
 - Key KPIs: <…>
 - Interfaces & stakeholders: <…>
 - Team practices & operating rhythm: <…>
-- Operations & systems:
-    - <System> — purpose · data type · owner · access path
+
+### Operations & Systems
+
+| System | Purpose | Data type | Owner | Access path |
+| --- | --- | --- | --- | --- |
+| <System> | <purpose> | <data> | <owner> | <link/path> |
 
 Systems map:
 
@@ -83,7 +87,7 @@ Org chart rules:
 - Node labels must be plain text like "Name — Role". Do not use HTML.
 
 Systems map rules:
-- Create one central node for the team and a node for each system labeled "System — purpose" (omit pieces if unknown).
+- Create one central node for the team and a node for each system using the table row labels (System and Purpose only).
 - Connect the team node to each system node; do not connect systems to each other.
 
 Synthesis guidance:

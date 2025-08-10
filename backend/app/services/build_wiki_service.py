@@ -1,70 +1,57 @@
-from __future__ import annotations
-
+import asyncio
 import logging
-import os
-import time
 from pathlib import Path
 
-from app.agents.wiki_agent import generate_business_wiki
+from app.agents.chain import run_chain
 
 logger = logging.getLogger(__name__)
 
 
-def read_file_text(path: Path) -> str:
-    text = path.read_text(encoding="utf-8")
-    logger.debug("Read file: %s (%d chars)", str(path), len(text))
-    return text
+async def build_wiki_from_yaml_text(
+    yaml_text: str, docs_root_dir: Path, model: str = "openai/gpt-5-mini-2025-08-07"
+) -> tuple[dict, list[Path]]:
+    """
+    Build complete wiki from YAML text: plan navigation, create files, and update mkdocs.yml.
+    
+    Args:
+        yaml_text: The employee Q&A YAML data
+        docs_root_dir: Path to the docs directory containing mkdocs.yml
+        model: The LLM model to use
+        
+    Returns:
+        Tuple of (sections_plan, created_files)
+    """
+    logger.info("Building wiki from YAML text")
+
+    # Run the complete chain: plan sections, create files, and update navigation
+    docs_output_dir = docs_root_dir / "docs"
+    sections_plan, created_files = await run_chain(yaml_text, docs_output_dir, docs_root_dir, model=model)
+
+    logger.info("Wiki build completed")
+    return sections_plan, created_files
 
 
-def write_text(path: Path, text: str) -> None:
-    bytes_written = path.write_text(text, encoding="utf-8")
-    logger.debug("Wrote file: %s (%d chars)", str(path), len(text))
-    return bytes_written
-
-
-def build_wiki_from_yaml_text(yaml_text: str, model: str | None = None) -> str:
-    resolved_model = model or os.getenv("SONNET_MODEL", "groq/moonshotai/kimi-k2-instruct")
-    logger.info("Building wiki from YAML text", extra={"model": resolved_model})
-    start_time = time.perf_counter()
-    markdown = generate_business_wiki(yaml_text=yaml_text, model=resolved_model)
-    duration_ms = int((time.perf_counter() - start_time) * 1000)
-    logger.info("Wiki generated from text in %d ms", duration_ms)
-    logger.debug("Markdown length: %d chars", len(markdown))
-    return markdown
-
-
-def build_wiki_from_yaml_file(yaml_path: Path, output_path: Path | None = None) -> Path:
-    logger.info("Building wiki from file: %s", str(yaml_path))
-    start_time = time.perf_counter()
-
-    yaml_text = read_file_text(yaml_path)
-    markdown = build_wiki_from_yaml_text(yaml_text)
-
-    if output_path is None:
-        stem = yaml_path.stem
-        output_path = yaml_path.parent / f"{stem}_wiki.md"
-
-    write_text(output_path, markdown)
-
-    duration_ms = int((time.perf_counter() - start_time) * 1000)
-    logger.info("Wiki written to %s in %d ms", str(output_path), duration_ms)
-    logger.debug("Output markdown length: %d chars", len(markdown))
-    return output_path
-
-
-def main() -> None:
+async def main() -> None:
+    """Main function to test wiki building with mock data."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
     backend_dir = Path(__file__).resolve().parents[2]
-    yaml_path = backend_dir / "tests" / "mock_data.yaml"
+    mock_data_path = backend_dir / "tests" / "mock_data.yaml"
     repo_root = backend_dir.parent
-    docs_output = repo_root / "docs" / "docs" / "dunder_mifflin.md"
+    docs_root_dir = repo_root / "docs"
 
-    logger.info("Starting wiki build", extra={"yaml": str(yaml_path), "output": str(docs_output)})
-    output_path = build_wiki_from_yaml_file(yaml_path, output_path=docs_output)
-    logger.info("Saved wiki to: %s", str(output_path))
+    logger.info("Starting wiki build", extra={"yaml": str(mock_data_path), "docs_root": str(docs_root_dir)})
+    
+    # Read YAML file and build wiki
+    yaml_text = mock_data_path.read_text(encoding="utf-8")
+    sections_plan, created_files = await build_wiki_from_yaml_text(yaml_text, docs_root_dir=docs_root_dir)
+    
+    logger.info("Wiki build completed", extra={
+        "sections_count": len(sections_plan.get("sections", [])),
+        "files_created": len(created_files)
+    })
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 
