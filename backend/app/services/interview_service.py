@@ -1,51 +1,123 @@
+"""Interview service for managing interview workflow and logic."""
+
 import os
 from typing import List, Optional
 from uuid import UUID, uuid4
 from sqlmodel import Session, select
 
-from app.models.models import Interview, Question, QuestionResponse
-from app.services.schemas.schema import NextQuestionRequest, NextQuestionResponse
+from app.models.models import Interview, Question, QuestionResponse, Employee
 import litellm
 
 
-class NextQuestionService:
-    """Service for getting the next question in an interview"""
-
-    def get_next_question(self, request: NextQuestionRequest, session: Session) -> NextQuestionResponse:
+class InterviewService:
+    """Service for managing interview operations."""
+    
+    def start_interview(self, employee_id: UUID, session: Session) -> Interview:
         """
-        Get the next question for an interview
-
+        Start a new interview for an employee.
+        
         Args:
-            request: NextQuestionRequest containing interview_id
+            employee_id: ID of the employee being interviewed
             session: Database session
-
+            
         Returns:
-            NextQuestionResponse containing question and is_interview_over flag
+            Created Interview instance
+            
+        Raises:
+            ValueError: If employee not found
+        """
+        # Validate that the employee exists
+        employee = session.get(Employee, employee_id)
+        if not employee:
+            raise ValueError("Employee not found")
+        
+        # Create a new interview for this employee
+        interview = Interview(business_id=employee.business_id, employee_id=employee.id)
+        session.add(interview)
+        session.commit()
+        session.refresh(interview)
+        
+        return interview
+    
+    def answer_question(
+        self, 
+        interview_id: UUID, 
+        question_id: UUID, 
+        content: str, 
+        session: Session
+    ) -> bool:
+        """
+        Record an employee's answer to a question during an interview.
+        
+        Args:
+            interview_id: ID of the interview
+            question_id: ID of the question being answered
+            content: The answer content
+            session: Database session
+            
+        Returns:
+            True if successful
+            
+        Raises:
+            ValueError: If interview or question not found, or validation fails
+        """
+        # Validate that the interview exists
+        interview = session.get(Interview, interview_id)
+        if not interview:
+            raise ValueError("Interview not found")
+        
+        # Validate that the question exists
+        question = session.get(Question, question_id)
+        if not question:
+            raise ValueError("Question not found")
+        
+        # Validate that the question belongs to the same business as the interview
+        if question.business_id != interview.business_id:
+            raise ValueError("Question does not belong to the same business as the interview")
+        
+        # Create the question response using the employee_id from the interview
+        response = QuestionResponse(
+            interview_id=interview_id,
+            employee_id=interview.employee_id,
+            question_id=question_id,
+            content=content
+        )
+        session.add(response)
+        session.commit()
+        
+        return True
+    
+    def next_question(self, interview_id: UUID, session: Session) -> Optional[Question]:
+        """
+        Get the next question for an interview following the pattern:
+        (base_question -> generated_followup_1 -> generated_followup_2) x N -> done
+        
+        Args:
+            interview_id: ID of the interview
+            session: Database session
+            
+        Returns:
+            Next Question instance or None if interview is complete
             
         Raises:
             ValueError: If interview not found
         """
         # Validate that the interview exists
-        interview = session.get(Interview, request.interview_id)
+        interview = session.get(Interview, interview_id)
         if not interview:
             raise ValueError("Interview not found")
         
         # Get all base questions for this business
         base_questions = self._get_base_questions(interview.business_id, session)
         if not base_questions:
-            return NextQuestionResponse(question=None, is_interview_over=True)
+            return None  # No questions configured for this business
         
         # Get all responses for this interview
-        responses = self._get_interview_responses(request.interview_id, session)
+        responses = self._get_interview_responses(interview_id, session)
         
         # Determine what the next question should be
-        next_question = self._determine_next_question(base_questions, responses, interview, session)
-        
-        if next_question is None:
-            return NextQuestionResponse(question=None, is_interview_over=True)
-        
-        return NextQuestionResponse(question=next_question, is_interview_over=False)
-
+        return self._determine_next_question(base_questions, responses, interview, session)
+    
     def _get_base_questions(self, business_id: UUID, session: Session) -> List[Question]:
         """Get all base questions for a business, ordered by index."""
         statement = (
@@ -64,7 +136,7 @@ class NextQuestionService:
             .where(QuestionResponse.interview_id == interview_id)
         )
         return list(session.exec(statement))
-
+    
     def _determine_next_question(
         self,
         base_questions: List[Question],
@@ -265,9 +337,9 @@ Respond with ONLY the question text, no additional formatting or explanation."""
 
 
 # Global service instance
-next_question_service = NextQuestionService()
+interview_service = InterviewService()
 
 
-def get_next_question_service() -> NextQuestionService:
-    """Get the global next question service instance."""
-    return next_question_service
+def get_interview_service() -> InterviewService:
+    """Get the global interview service instance."""
+    return interview_service
