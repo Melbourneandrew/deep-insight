@@ -24,7 +24,8 @@ dependencies = [
     "py-pglite[sqlalchemy] (>=0.4.1,<1.0.0)",
     "requests (>=2.31.0,<3.0.0)",
     "litellm (>=1.75.5.post1,<2.0.0)",
-    "python-dotenv (>=1.0.0,<2.0.0)"
+    "python-dotenv (>=1.0.0,<2.0.0)",
+    "tenacity (>=9.1.2,<10.0.0)"
 ]
 
 [tool.poetry.scripts]

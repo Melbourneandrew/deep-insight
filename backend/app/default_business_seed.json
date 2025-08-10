@@ -29,15 +29,18 @@
     },
     {
       "content": "Tell me about the projects you work on",
-      "is_follow_up": false
+      "is_follow_up": false,
+      "order_index": 3
     },
     {
       "content": "Who do you meet with and what do you talk about?",
-      "is_follow_up": false
+      "is_follow_up": false,
+      "order_index": 6
     },
     {
       "content": "What are the primary resources that you use to do your job effectively?",
-      "is_follow_up": false
+      "is_follow_up": false,
+      "order_index": 9
     }
   ]
 }

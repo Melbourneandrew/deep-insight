@@ -21,6 +21,43 @@ export interface CreateBusinessRequest {
   seed_data?: BusinessSeedData;
 }
 
+// Types for interview procedures
+export interface NextQuestionRequest {
+  interview_id: string;
+}
+
+export interface Question {
+  id: string;
+  content: string;
+  is_follow_up: boolean;
+  business_id: string;
+}
+
+export interface NextQuestionResponse {
+  question?: Question;
+  is_interview_over: boolean;
+}
+
+export interface AnswerQuestionRequest {
+  interview_id: string;
+  question_id: string;
+  content: string;
+}
+
+export interface AnswerQuestionResponse {
+  success: boolean;
+  interview_id: string;
+}
+
+// Types for starting interviews
+export interface StartInterviewRequest {
+  employee_id: string;
+}
+
+export interface StartInterviewResponse {
+  interview_id: string;
+}
+
 // Types for interview simulation
 export interface SimulateInterviewRequest {
   business_id: string;
@@ -174,6 +211,36 @@ export const api = {
   simulate: {
     interview: (request: SimulateInterviewRequest) =>
       fetch(`${API_BASE_URL}/simulate/interview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }),
+  },
+  procedures: {
+    startInterview: (request: StartInterviewRequest) =>
+      fetch(`${API_BASE_URL}/start-interview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }),
+    nextQuestion: (request: { interview_id: string }) =>
+      fetch(`${API_BASE_URL}/next-question`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }),
+    answerQuestion: (request: {
+      interview_id: string;
+      question_id: string;
+      content: string;
+    }) =>
+      fetch(`${API_BASE_URL}/answer-question`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

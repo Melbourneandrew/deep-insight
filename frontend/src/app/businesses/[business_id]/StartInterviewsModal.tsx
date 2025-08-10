@@ -29,7 +29,7 @@ export function StartInterviewsModal({
     setLoading(true);
     try {
       // Navigate to the interviews page to show simulated interviews
-      router.push(`/businesses/${businessId}/interviews`);
+      router.push(`/businesses/${businessId}/interview`);
       onClose();
     } catch (error) {
       console.error("Error starting simulated interview:", error);
@@ -41,8 +41,8 @@ export function StartInterviewsModal({
   const handleTakeInterview = async () => {
     setLoading(true);
     try {
-      // TODO: Implement take interview functionality
-      console.log("Take interview functionality not yet implemented");
+      // Navigate to the interview start page
+      router.push(`/businesses/${businessId}/interview/start`);
       onClose();
     } catch (error) {
       console.error("Error starting interview:", error);
