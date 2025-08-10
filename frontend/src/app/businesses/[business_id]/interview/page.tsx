@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, MessageSquare, Boxes } from "lucide-react";
 import { api } from "@/lib/api";
+import BuildWikiLoadingModal from "./BuildWikiLoadingModal";
 
 interface QuestionResponseDetail {
   question_id: string;
@@ -101,9 +102,13 @@ export default function InterviewsPage() {
 
       // You might want to show a success message or redirect here
       console.log("Wiki build started successfully");
+
+      // Keep the modal open for a minimum duration to show the process
+      setTimeout(() => {
+        setBuildingWiki(false);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to build wiki");
-    } finally {
       setBuildingWiki(false);
     }
   };
@@ -261,6 +266,13 @@ export default function InterviewsPage() {
           ))}
         </div>
       )}
+
+      {/* Build Wiki Loading Modal */}
+      <BuildWikiLoadingModal
+        isOpen={buildingWiki}
+        headerText="Building Wiki"
+        duration={25}
+      />
     </div>
   );
 }
