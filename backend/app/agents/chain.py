@@ -121,26 +121,7 @@ async def write_documentation_content(yaml_text: str, title: str, section_name: 
         return content
 
 
-def _create_index_file(docs_output_dir: Path) -> list[Path]:
-    """Create index.md file if it doesn't exist."""
-    created_files = []
-    index_path = docs_output_dir / "index.md"
-    
-    if not index_path.exists():
-        index_content = """# Documentation Home
 
-Welcome to the company documentation portal.
-
-## TODO
-- Add company overview
-- Add navigation guide
-- Add getting started information
-"""
-        index_path.write_text(index_content, encoding="utf-8")
-        created_files.append(index_path)
-        logger.info("Created index.md")
-    
-    return created_files
 
 
 def _collect_docs_to_create(sections: list, docs_output_dir: Path) -> list[dict]:
@@ -229,8 +210,8 @@ async def create_documentation_files(sections_json: dict, docs_output_dir: Path,
     # Ensure docs output directory exists
     docs_output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Create index.md if needed
-    created_files = _create_index_file(docs_output_dir)
+    # Initialize created files list - no hardcoded index.md anymore
+    created_files = []
     
     # Collect all documents that need to be created
     docs_to_create = _collect_docs_to_create(sections, docs_output_dir)
@@ -283,12 +264,12 @@ async def run_chain(yaml_text: str, docs_output_dir: Path, docs_root_dir: Path, 
     
     # Step 1: Plan documentation sections
     sections_plan = await plan_documentation_sections(yaml_text, model=model)
-    
-    # Step 2: Create documentation files with generated content (async with semaphore)
-    created_files = await create_documentation_files(sections_plan, docs_output_dir, yaml_text, model)
-    
-    # Step 3: Update mkdocs.yml navigation
+
+    # Step 2: Update mkdocs.yml navigation
     update_mkdocs_navigation(sections_plan, docs_root_dir)
+    
+    # Step 3: Create documentation files with generated content (async with semaphore)
+    created_files = await create_documentation_files(sections_plan, docs_output_dir, yaml_text, model)
     
     logger.info("Documentation chain completed", extra={
         "sections_count": len(sections_plan.get("sections", [])),

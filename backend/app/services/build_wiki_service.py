@@ -1,10 +1,32 @@
 import asyncio
 import logging
+import shutil
 from pathlib import Path
 
 from app.agents.chain import run_chain
 
 logger = logging.getLogger(__name__)
+
+
+def clear_docs_folder(docs_output_dir: Path) -> None:
+    """
+    Clear all contents of the docs output directory.
+    
+    Args:
+        docs_output_dir: Path to the docs directory to clear
+    """
+    if docs_output_dir.exists():
+        logger.info(f"Clearing contents of {docs_output_dir}")
+        # Remove all contents but keep the directory itself
+        for item in docs_output_dir.iterdir():
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
+        logger.info("Docs folder cleared successfully")
+    else:
+        logger.info(f"Docs directory {docs_output_dir} does not exist, creating it")
+        docs_output_dir.mkdir(parents=True, exist_ok=True)
 
 
 async def build_wiki_from_yaml_text(
@@ -23,8 +45,11 @@ async def build_wiki_from_yaml_text(
     """
     logger.info("Building wiki from YAML text")
 
-    # Run the complete chain: plan sections, create files, and update navigation
+    # Clear the docs output directory before building
     docs_output_dir = docs_root_dir / "docs"
+    clear_docs_folder(docs_output_dir)
+
+    # Run the complete chain: plan sections, create files, and update navigation
     sections_plan, created_files = await run_chain(yaml_text, docs_output_dir, docs_root_dir, model=model)
 
     logger.info("Wiki build completed")

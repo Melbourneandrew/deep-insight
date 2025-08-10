@@ -37,6 +37,7 @@ Create a complete, professional markdown document that synthesizes the relevant 
 - Use code blocks for system names, file paths, or technical terms
 - Use emphasis (*italic*) and strong (**bold**) appropriately
 - Include horizontal rules (---) to separate major sections
+- **Important for MkDocs compatibility**: Use 4 spaces for nested bullet point indentation (not 2 spaces or tabs)
 
 ### What to Include
 Based on the Q&A data, your document should cover:
@@ -49,6 +50,28 @@ Based on the Q&A data, your document should cover:
 - **Escalation procedures** - when and how to escalate
 - **Meeting cadences** - recurring meetings and their purposes
 - **Metrics and KPIs** - how success is measured
+
+### Special Instructions for Business Overview Documents
+If you are writing a "Business Overview" document, follow this specific structure:
+
+#### Snapshot Section
+- **What we do** - Clear description of the business, its mission, and core purpose
+- **Who we serve & why we win** - Target customers and competitive advantages
+- **Strategic priorities (12 mo)** - Key strategic initiatives for the next 12 months
+- **Core KPIs** - Primary metrics that measure business success
+
+#### Customers & GTM Section
+- **ICP & primary use cases** - Ideal customer profile and main use cases for the product/service
+- **Segments & channels** - Customer segments and go-to-market channels
+- **Top customers/logos** - Key customers and notable client logos
+
+#### People & Org Section
+- **Key leaders** - Leadership team and important personnel
+- **Ways of working (company)** - Company culture, work environment, and operating principles
+- **Org chart** - Organizational structure (use mermaid diagram if employee data supports it)
+- **Headcount by function** - Team sizes and distribution across departments
+
+This should be written as a comprehensive company overview that helps new employees and stakeholders understand the business structure, strategy, and operations.
 
 ### What NOT to Include
 - Don't create fictional information not found in the Q&A data
@@ -76,7 +99,10 @@ Description of the main topic...
 
 ### Process B
 - Point one
+    - Sub-point with 4-space indentation
+    - Another sub-point
 - Point two
+    - Nested detail with proper spacing
 
 ## Section 3: Tools and Systems
 | Tool | Purpose | Owner |

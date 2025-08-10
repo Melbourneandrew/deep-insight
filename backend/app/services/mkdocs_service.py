@@ -162,9 +162,6 @@ class MkDocsNavService:
         
         nav_entries = []
         
-        # Always add Home first
-        nav_entries.append({"Home": "index.md"})
-        
         for section in sections:
             if not isinstance(section, dict):
                 continue
