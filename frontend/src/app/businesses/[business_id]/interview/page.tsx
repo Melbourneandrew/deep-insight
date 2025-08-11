@@ -271,7 +271,7 @@ export default function InterviewsPage() {
       <BuildWikiLoadingModal
         isOpen={buildingWiki}
         headerText="Building Wiki"
-        duration={25}
+        duration={60}
       />
     </div>
   );

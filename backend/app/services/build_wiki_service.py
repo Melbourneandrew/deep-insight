@@ -9,8 +9,7 @@ from uuid import UUID
 import yaml
 from app.agents.chain import run_chain
 from app.db import get_session
-from app.models.models import (Business, Employee, Interview, Question,
-                               QuestionResponse)
+from app.models.models import Business, Employee, Interview, Question, QuestionResponse
 from app.services.schemas.schema import BuildWikiRequest, BuildWikiResponse
 from fastapi import Depends
 from sqlmodel import Session, select
@@ -27,13 +26,13 @@ class BuildWikiService:
     async def build_wiki(self, request: BuildWikiRequest) -> BuildWikiResponse:
         """
         Build wiki documentation from interview data for a business.
-        
+
         Args:
             request: BuildWikiRequest containing business_id
-            
+
         Returns:
             BuildWikiResponse containing success status and build results
-            
+
         Raises:
             ValueError: If business not found or no interview data exists
         """
@@ -60,7 +59,13 @@ class BuildWikiService:
         model = os.getenv("WIKI_MODEL", "openai/gpt-5-mini-2025-08-07")
 
         # Build wiki using the existing build_wiki_from_yaml_text function
-        sections_plan, created_files = await run_chain(yaml_text, docs_output_dir, docs_root_dir, model=model)
+        sections_plan, created_files = await run_chain(
+            yaml_text,
+            docs_output_dir,
+            docs_root_dir,
+            model=model,
+            business_name=business.name,
+        )
 
         # Convert Path objects to strings for the response
         file_paths = [str(file_path) for file_path in created_files]
@@ -69,13 +74,13 @@ class BuildWikiService:
             success=True,
             business_id=request.business_id,
             sections_plan=sections_plan,
-            files_created=file_paths
+            files_created=file_paths,
         )
 
     def _clear_docs_folder(self, docs_output_dir: Path) -> None:
         """
         Clear all contents of the docs output directory.
-        
+
         Args:
             docs_output_dir: Path to the docs directory to clear
         """
@@ -95,17 +100,19 @@ class BuildWikiService:
     def _generate_yaml_from_interviews(self, business_id: UUID) -> str:
         """
         Generate YAML content from interview data for a business.
-        
+
         Args:
             business_id: UUID of the business
-            
+
         Returns:
             YAML string containing employee interview data
         """
         # Get all employees for the business
-        employees = list(self.session.exec(
-            select(Employee).where(Employee.business_id == business_id)
-        ))
+        employees = list(
+            self.session.exec(
+                select(Employee).where(Employee.business_id == business_id)
+            )
+        )
 
         if not employees:
             return ""
@@ -115,43 +122,46 @@ class BuildWikiService:
 
         for employee in employees:
             # Get all interviews for this employee
-            interviews = list(self.session.exec(
-                select(Interview).where(
-                    Interview.employee_id == employee.id,
-                    Interview.business_id == business_id
+            interviews = list(
+                self.session.exec(
+                    select(Interview).where(
+                        Interview.employee_id == employee.id,
+                        Interview.business_id == business_id,
+                    )
                 )
-            ))
+            )
 
             if not interviews:
                 continue
 
             # Collect all Q&A for this employee across all interviews
             qa_pairs = []
-            
+
             for interview in interviews:
                 # Get all responses for this interview
-                responses = list(self.session.exec(
-                    select(QuestionResponse)
-                    .where(QuestionResponse.interview_id == interview.id)
-                    .join(Question, QuestionResponse.question_id == Question.id)
-                    .order_by(Question.order_index)
-                ))
+                responses = list(
+                    self.session.exec(
+                        select(QuestionResponse)
+                        .where(QuestionResponse.interview_id == interview.id)
+                        .join(Question, QuestionResponse.question_id == Question.id)
+                        .order_by(Question.order_index)
+                    )
+                )
 
                 for response in responses:
                     # Get the question content
                     question = self.session.get(Question, response.question_id)
                     if question:
-                        qa_pairs.append({
-                            "question": question.content,
-                            "answer": response.content
-                        })
+                        qa_pairs.append(
+                            {"question": question.content, "answer": response.content}
+                        )
 
             if qa_pairs:
                 employee_data = {
                     "name": employee.email.split("@")[0].replace(".", " ").title(),
-                    "qa": qa_pairs
+                    "qa": qa_pairs,
                 }
-                    
+
                 yaml_data["employees"].append(employee_data)
 
         # Convert to YAML string

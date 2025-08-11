@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DeepInsightLogo from "./DeepInsightLogo";
 import "./globals.css";
@@ -61,6 +62,7 @@ export default function RootLayout({
                   About
                 </Link>
                 <Button size="sm" variant="default">
+                  <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>
               </div>
