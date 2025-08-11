@@ -1,9 +1,10 @@
 # DeepInsight - AI-Powered Business Intelligence Platform
 
-DeepInsight transforms organizational knowledge capture through intelligent employee questionnaires and automated wiki generation. Drawing inspiration from [Cognition's DeepWiki](https://deepwiki.com/) which creates "up-to-date documentation you can talk to" for codebases, DeepInsight applies this same conversational AI approach to business intelligence and organizational knowledge.
+DeepInsight revolutionizes organizational knowledge capture through intelligent questionnaire systems and automated documentation generation. Our platform enables administrators to distribute question series to employees who respond via an omnibox interface supporting text, file uploads, and employee references, while AI agents analyze responses in real-time to generate contextual follow-up questions. The sophisticated multi-agent architecture transforms raw responses into professional business wikis through a Document Planning Agent that creates optimal documentation hierarchies, a Content Generation Agent that employs narrative writing techniques, and a Wiki Assembly System that orchestrates parallel document creation into MkDocs Material-themed wikis complete with Mermaid organizational charts.
 
-Where DeepWiki revolutionizes technical documentation by making GitHub repositories accessible through AI-powered interfaces, DeepInsight revolutionizes business documentation by making organizational knowledge accessible through intelligent questionnaire systems. The platform enables administrators to create question series distributed via email to employees, who respond through an intelligent omnibox interface supporting text, file uploads, and employee references. AI agents automatically generate contextual follow-up questions and process all responses into comprehensive business wikis that document operational frameworks, processes, and personnel relationships.
+DeepInsight delivers immediate value by capturing the current state of your business and establishing a foundation for dynamic documentation that evolves alongside your organization. The platform creates an auditable record of organizational knowledge, making it invaluable for compliance requirements and historical business analysis. For growing companies, this automated documentation generation significantly streamlines the onboarding process for new employees, providing them with comprehensive, up-to-date insights into company operations, processes, and personnel relationships. The structured knowledge base also proves essential during due diligence processes for mergers and acquisitions, offering potential buyers or partners clear visibility into how the business actually operates.
 
+Looking ahead, DeepInsight's knowledge foundation enables powerful conversational interfaces where team members can directly query the documentation to answer critical business questions like "Who do I need to talk to to get this done?" This chat functionality transforms static documentation into an interactive business intelligence system. The platform's architecture also supports integration of meeting minutes and other business communications into the knowledge base, automatically encoding processes from approvals and product demonstrations to sales meetings with customers, creating a comprehensive operational memory that captures not just what the business does, but how decisions are made and executed.
 
 ## 🤖 AI Implementation & Methodology
 
@@ -15,15 +16,14 @@ Where DeepWiki revolutionizes technical documentation by making GitHub repositor
 ### Deep Agent Wiki Processing
 The platform employs a sophisticated multi-agent approach for knowledge base generation:
 
+#### Interview Agent
+- Interviews employees via an intelligent interface
+- Generates follow-up questions based on employee responses aimed at uncovering siloed, employee-specific information
+
 #### Document Planning Agent
 - Analyzes employee Q&A data to create structured navigation plans
 - Uses prompt engineering to generate optimal documentation hierarchy (max 5 sections, 10 documents)
 - Produces JSON navigation structures for MkDocs integration
-
-#### Content Generation Agent  
-- Transforms raw employee responses into coherent markdown documentation
-- Employs narrative writing prompts for clear, plain English output
-- Generates business overviews, team directories, process documentation, and systems maps
 
 #### Wiki Assembly System
 - Orchestrates parallel document creation using asyncio for performance
