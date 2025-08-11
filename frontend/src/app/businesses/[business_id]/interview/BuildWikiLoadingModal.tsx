@@ -116,11 +116,10 @@ export default function BuildWikiLoadingModal({
         <div className="flex flex-col items-center space-y-8 p-4">
           {/* Main Title */}
           <DialogTitle className="sr-only">{headerText}</DialogTitle>
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl font-light tracking-wider text-gray-800 uppercase">
+          <div className="text-center">
+            <h1 className="text-4xl text-gray-800 uppercase font-bold mb-0">
               {headerText}
             </h1>
-            <div className="w-16 h-px bg-gray-400 mx-auto" />
           </div>
 
           {/* Block Grid Animation */}

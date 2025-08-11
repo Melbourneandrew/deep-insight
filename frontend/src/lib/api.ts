@@ -255,7 +255,7 @@ export const api = {
         body: JSON.stringify(request),
       }),
     buildWiki: (request: { business_id: string }) =>
-      fetch(`${API_BASE_URL}/build-wiki`, {
+      fetch(`${API_BASE_URL}/build-wiki/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
