@@ -234,7 +234,7 @@ class SimulateInterviewService:
         for i in range(max_questions):
             # Use next question service
             next_question_request = NextQuestionRequest(interview_id=interview.id)
-            next_question_response = next_question_service.get_next_question(next_question_request)
+            next_question_response = await next_question_service.get_next_question(next_question_request)
 
             if next_question_response.is_interview_over or not next_question_response.question:
                 logger.info(f"Interview simulation completed after {i} questions")
@@ -315,7 +315,7 @@ Respond only with the answer content, no additional formatting or explanation.""
 
         try:
             # Use sync completion with proper error handling for better reliability
-            response = litellm.completion(
+            response = await litellm.acompletion(
                 model=model,
                 messages=messages,
                 max_tokens=200,

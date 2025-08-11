@@ -18,7 +18,7 @@ class NextQuestionService:
     def __init__(self, session: Session):
         self.session = session
 
-    def get_next_question(self, request: NextQuestionRequest) -> NextQuestionResponse:
+    async def get_next_question(self, request: NextQuestionRequest) -> NextQuestionResponse:
         """
         Get the next question for an interview following the pattern:
         (base_question -> generated_followup_1 -> generated_followup_2) x N -> done
@@ -46,7 +46,7 @@ class NextQuestionService:
         responses = self._get_interview_responses(request.interview_id)
 
         # Determine what the next question should be
-        next_question = self._determine_next_question(
+        next_question = await self._determine_next_question(
             base_questions, responses, interview
         )
 
@@ -76,7 +76,7 @@ class NextQuestionService:
         )
         return list(self.session.exec(statement))
 
-    def _determine_next_question(
+    async def _determine_next_question(
         self,
         base_questions: List[Question],
         responses: List[QuestionResponse],
@@ -97,14 +97,14 @@ class NextQuestionService:
 
         if not last_question.is_follow_up:
             # Just answered a base question, generate first follow-up
-            return self._generate_follow_up_question(responses, interview, 1)
+            return await self._generate_follow_up_question(responses, interview, 1)
         else:
             # This was a follow-up question
             follow_up_count = self._count_recent_follow_ups(responses)
 
             if follow_up_count < 2:
                 # Generate second follow-up
-                return self._generate_follow_up_question(
+                return await self._generate_follow_up_question(
                     responses, interview, follow_up_count + 1
                 )
             else:
@@ -184,7 +184,7 @@ class NextQuestionService:
         # For base question at index 6: follow-ups go to 7, 8
         return base_question_order_index + follow_up_number
 
-    def _generate_follow_up_question(
+    async def _generate_follow_up_question(
         self,
         responses: List[QuestionResponse],
         interview: Interview,
@@ -196,7 +196,7 @@ class NextQuestionService:
         conversation_history = self._build_conversation_history(responses)
 
         # Generate question using LiteLLM
-        question_content = self._generate_question_with_llm(
+        question_content = await self._generate_question_with_llm(
             conversation_history, follow_up_number
         )
 
@@ -237,7 +237,7 @@ class NextQuestionService:
 
         return conversation
 
-    def _generate_question_with_llm(
+    async def _generate_question_with_llm(
         self, conversation_history: List[dict], follow_up_number: int
     ) -> str:
         """Generate a follow-up question using LiteLLM with INTERVIEW_MODEL env var."""
@@ -268,7 +268,7 @@ Respond with ONLY the question text, no additional formatting or explanation."""
         )
 
         try:
-            response = litellm.completion(
+            response = await litellm.acompletion(
                 model=model, messages=messages, max_tokens=300, temperature=0.7
             )
             

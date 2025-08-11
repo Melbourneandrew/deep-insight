@@ -90,7 +90,7 @@ class InterviewService:
         
         return True
     
-    def next_question(self, interview_id: UUID, session: Session) -> Optional[Question]:
+    async def next_question(self, interview_id: UUID, session: Session) -> Optional[Question]:
         """
         Get the next question for an interview following the pattern:
         (base_question -> generated_followup_1 -> generated_followup_2) x N -> done
@@ -111,17 +111,17 @@ class InterviewService:
             raise ValueError("Interview not found")
         
         # Get all base questions for this business
-        base_questions = self._get_base_questions(interview.business_id, session)
+        base_questions = await self._get_base_questions(interview.business_id, session)
         if not base_questions:
             return None  # No questions configured for this business
         
         # Get all responses for this interview
-        responses = self._get_interview_responses(interview_id, session)
+        responses = await self._get_interview_responses(interview_id, session)
         
         # Determine what the next question should be
-        return self._determine_next_question(base_questions, responses, interview, session)
+        return await self._determine_next_question(base_questions, responses, interview, session)
     
-    def _get_base_questions(self, business_id: UUID, session: Session) -> List[Question]:
+    async def _get_base_questions(self, business_id: UUID, session: Session) -> List[Question]:
         """Get all base questions for a business, ordered by index."""
         statement = (
             select(Question)
@@ -132,7 +132,7 @@ class InterviewService:
         # Sort by order_index manually to handle None values
         return sorted(base_questions_raw, key=lambda q: q.order_index if q.order_index is not None else 999)
     
-    def _get_interview_responses(self, interview_id: UUID, session: Session) -> List[QuestionResponse]:
+    async def _get_interview_responses(self, interview_id: UUID, session: Session) -> List[QuestionResponse]:
         """Get all responses for an interview."""
         statement = (
             select(QuestionResponse)
@@ -140,7 +140,7 @@ class InterviewService:
         )
         return list(session.exec(statement))
     
-    def _determine_next_question(
+    async def _determine_next_question(
         self,
         base_questions: List[Question],
         responses: List[QuestionResponse],
@@ -162,14 +162,14 @@ class InterviewService:
         
         if not last_question.is_follow_up:
             # Just answered a base question, generate first follow-up
-            return self._generate_follow_up_question(responses, interview, session, 1)
+            return await self._generate_follow_up_question(responses, interview, session, 1)
         else:
             # This was a follow-up question
             follow_up_count = self._count_recent_follow_ups(responses, session)
             
             if follow_up_count < 2:
                 # Generate second follow-up
-                return self._generate_follow_up_question(responses, interview, session, follow_up_count + 1)
+                return await self._generate_follow_up_question(responses, interview, session, follow_up_count + 1)
             else:
                 # Move to next base question
                 current_base_index = self._get_current_base_question_index(responses, base_questions, session)
@@ -216,7 +216,7 @@ class InterviewService:
         
         return 0  # Default to first question if not found
     
-    def _generate_follow_up_question(
+    async def _generate_follow_up_question(
         self,
         responses: List[QuestionResponse],
         interview: Interview,
@@ -229,7 +229,7 @@ class InterviewService:
         conversation_history = self._build_conversation_history(responses, session)
         
         # Generate question using LiteLLM
-        question_content = self._generate_question_with_llm(conversation_history, follow_up_number)
+        question_content = await self._generate_question_with_llm(conversation_history, follow_up_number)
         
         # Create and save the generated question
         generated_question = Question(
@@ -267,7 +267,7 @@ class InterviewService:
         
         return conversation
     
-    def _generate_question_with_llm(self, conversation_history: List[dict], follow_up_number: int) -> str:
+    async def _generate_question_with_llm(self, conversation_history: List[dict], follow_up_number: int) -> str:
         """Generate a follow-up question using LiteLLM with INTERVIEW_MODEL env var."""
         
         model = os.getenv("INTERVIEW_MODEL", "openrouter/openai/gpt-oss-120b")
@@ -291,7 +291,7 @@ Respond with ONLY the question text, no additional formatting or explanation."""
         ]
         
         try:
-            response = litellm.completion(
+            response = await litellm.acompletion(
                 model=model,
                 messages=messages,
                 max_tokens=150,
