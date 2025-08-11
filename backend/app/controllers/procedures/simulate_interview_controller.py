@@ -44,7 +44,7 @@ async def run_employee_simulation_task(request: SimulateEmployeeInterviewRequest
         try:
             result = await service.simulate_employee_interview(request)
             print(f"Employee simulation completed for employee {request.employee_id}")
-            print(f"Interview ID: {result.interview_id}, Exchanges: {len(result.simulated_exchanges)}")
+            print(f"Answered {len(result.simulated_exchanges)} questions")
         except Exception as e:
             print(f"Employee simulation failed for employee {request.employee_id}: {e}")
 

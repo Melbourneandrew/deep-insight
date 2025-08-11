@@ -16,7 +16,12 @@ def _get_database_url() -> str:
 
 
 DATABASE_URL = _get_database_url()
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(
+    DATABASE_URL, 
+    echo=False,
+    pool_size=200,
+    max_overflow=50
+)
 
 
 def create_db_and_tables() -> None:
