@@ -19,7 +19,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 @router.get("/", response_model=List[Business])
 def list_businesses(session: Session = Depends(get_session)) -> List[Business]:
     return list(
-        session.exec(select(Business).order_by(Business.created_at.asc())).all()  # type: ignore
+        session.exec(select(Business).order_by(Business.created_at.desc())).all()  # type: ignore
     )
 
 
